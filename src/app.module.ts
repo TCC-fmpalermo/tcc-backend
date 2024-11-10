@@ -4,6 +4,11 @@ import { RolesModule } from './roles/roles.module';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { PermissionsModule } from './permissions/permissions.module';
+import { InstancesModule } from './instances/instances.module';
+import { CloudOptionsModule } from './cloud-options/cloud-options.module';
+import { VolumesModule } from './volumes/volumes.module';
+import { CloudRequestsModule } from './cloud-requests/cloud-requests.module';
+import { CloudResourcesModule } from './cloud-resources/cloud-resources.module';
 
 @Module({
   imports: [
@@ -14,6 +19,11 @@ import { PermissionsModule } from './permissions/permissions.module';
     RolesModule,
     UsersModule,
     PermissionsModule,
+    InstancesModule,
+    CloudOptionsModule,
+    VolumesModule,
+    CloudRequestsModule,
+    CloudResourcesModule,
   ],
   controllers: [],
   providers: [],
