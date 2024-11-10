@@ -1,0 +1,40 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: pnpm run start:dev
+    env_file:
+      - ./.env
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - tcc-network
+    depends_on:
+      - pgsql
+  pgsql:
+    image: postgres:17
+    container_name: postgres-tcc
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      PGPASSWORD: '${DB_PASSWORD:-secret}'
+      POSTGRES_USER: '${DB_USER}'
+      POSTGRES_DB: '${DB_NAME}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+    env_file:
+      - .env
+    networks:
+      - tcc-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+networks:
+  tcc-network:
+    driver: bridge
+volumes:
+  postgres_data:
+    driver: local
