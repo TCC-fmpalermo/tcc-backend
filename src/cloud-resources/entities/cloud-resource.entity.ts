@@ -23,10 +23,10 @@ import { Volume } from "../../volumes/entities/volume.entity";
     alias!: string;
   
     @Property()
-    createdAt!: Date;
+    createdAt = new Date();;
   
-    @Property({ nullable: true })
-    updatedAt?: Date;
+    @Property({ nullable: true, onUpdate: () => new Date() })
+    updatedAt = new Date();
   
     @Property({ nullable: true })
     deletedAt?: Date;

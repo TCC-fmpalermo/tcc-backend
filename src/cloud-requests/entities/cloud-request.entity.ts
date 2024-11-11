@@ -29,7 +29,7 @@ import { User } from "../../users/entities/user.entity";
     status: CloudRequestStatus = CloudRequestStatus.Pendente;
   
     @Property()
-    requestedAt!: Date;
+    requestedAt = new Date();
   
     @Property({ nullable: true })
     finishedAt?: Date;

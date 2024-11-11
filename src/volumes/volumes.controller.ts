@@ -29,6 +29,6 @@ export class VolumesController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.volumesService.remove(+id);
+    return this.volumesService.remove(BigInt(id));
   }
 }

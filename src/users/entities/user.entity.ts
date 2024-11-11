@@ -36,10 +36,10 @@ import { Role } from "../../roles/entities/role.entity";
     role!: Role;
   
     @Property()
-    createdAt!: Date;
+    createdAt = new Date();
   
-    @Property({ nullable: true })
-    updatedAt?: Date;
+    @Property({ nullable: true, onUpdate: () => new Date() })
+    updatedAt = new Date();
   
     @Enum(() => UserStatus)
     status: UserStatus = UserStatus.Pendente;

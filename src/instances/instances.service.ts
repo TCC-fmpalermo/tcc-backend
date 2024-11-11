@@ -1,26 +1,45 @@
 import { Injectable } from '@nestjs/common';
 import { CreateInstanceDto } from './dto/create-instance.dto';
 import { UpdateInstanceDto } from './dto/update-instance.dto';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { Instance } from './entities/instance.entity';
+import { EntityRepository, wrap } from '@mikro-orm/core';
+import { EntityManager } from '@mikro-orm/postgresql';
 
 @Injectable()
 export class InstancesService {
-  create(createInstanceDto: CreateInstanceDto) {
-    return 'This action adds a new instance';
+  constructor(
+    @InjectRepository(Instance)
+    private readonly instanceRepository: EntityRepository<Instance>,
+    private readonly em: EntityManager
+  ) {}
+
+  async create(createInstanceDto: CreateInstanceDto) {
+    const instance = this.instanceRepository.create(createInstanceDto);
+    await this.em.persistAndFlush(instance);
+    return instance;
   }
 
   findAll() {
-    return `This action returns all instances`;
+    return this.instanceRepository.findAll();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} instance`;
+    return this.em.findOne(Instance, id);
   }
 
-  update(id: number, updateInstanceDto: UpdateInstanceDto) {
-    return `This action updates a #${id} instance`;
+  async update(id: number, updateInstanceDto: UpdateInstanceDto) {
+    const instance = await this.findOne(id);
+    if (!instance) return null;
+    wrap(instance).assign(updateInstanceDto);
+    await this.em.flush();
+    return instance;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} instance`;
+  async remove(id: bigint) {
+    const instance = this.em.getReference(Instance, id);
+    if (!instance) return null;
+    await this.em.removeAndFlush(instance);
+    return instance;
   }
 }

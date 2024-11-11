@@ -3,7 +3,7 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Role } from './entities/role.entity';
-import { EntityRepository } from '@mikro-orm/core';
+import { EntityRepository, wrap } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
 
 @Injectable()
@@ -13,9 +13,11 @@ export class RolesService {
     private readonly roleRepository: EntityRepository<Role>,
     private readonly em: EntityManager
   ) {}
+
   async create(createRoleDto: CreateRoleDto) {
     const role = this.roleRepository.create(createRoleDto);
-    return await this.em.persistAndFlush(role);
+    await this.em.persistAndFlush(role);
+    return role;
   }
 
   findAll() {
@@ -23,14 +25,21 @@ export class RolesService {
   }
 
   findOne(id: number) {
-    return this.roleRepository.findOne(id);
+    return this.em.findOne(Role, id);
   }
 
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
+  async update(id: number, updateRoleDto: UpdateRoleDto) {
+    const role = await this.findOne(id);
+    if (!role) return null;
+    wrap(role).assign(updateRoleDto);
+    await this.em.flush();
+    return role;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} role`;
+  async remove(id: bigint) {
+    const role = this.em.getReference(Role, id);
+    if (!role) return null;
+    await this.em.removeAndFlush(role);
+    return role;
   }
 }
