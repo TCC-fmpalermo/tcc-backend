@@ -9,6 +9,7 @@ import { CloudOptionsModule } from './cloud-options/cloud-options.module';
 import { VolumesModule } from './volumes/volumes.module';
 import { CloudRequestsModule } from './cloud-requests/cloud-requests.module';
 import { CloudResourcesModule } from './cloud-resources/cloud-resources.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CloudResourcesModule } from './cloud-resources/cloud-resources.module';
     VolumesModule,
     CloudRequestsModule,
     CloudResourcesModule,
+    AuthModule
   ],
   controllers: [],
   providers: [],

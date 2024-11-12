@@ -24,11 +24,11 @@ export class RolesService {
     return this.roleRepository.findAll();
   }
 
-  findOne(id: number) {
+  findOne(id: bigint) {
     return this.em.findOne(Role, id);
   }
 
-  async update(id: number, updateRoleDto: UpdateRoleDto) {
+  async update(id: bigint, updateRoleDto: UpdateRoleDto) {
     const role = await this.findOne(id);
     if (!role) return null;
     wrap(role).assign(updateRoleDto);

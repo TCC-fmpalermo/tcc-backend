@@ -6,8 +6,9 @@ export class CreateUserDto extends PickType(User, [
   "lastName",
   "email",
   "password",
-  "role",
   "createdAt",
   "updatedAt",
   "status",
-]) {}
+]) {
+  roleId!: bigint;
+}
