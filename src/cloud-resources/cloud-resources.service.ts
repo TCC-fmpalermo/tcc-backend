@@ -36,7 +36,7 @@ export class CloudResourcesService {
     return cloudResource;
   }
 
-  async remove(id: bigint) {
+  async remove(id: number) {
     const cloudResource = this.em.getReference(CloudResource, id);
     if (!cloudResource) return null;
     await this.em.removeAndFlush(cloudResource);

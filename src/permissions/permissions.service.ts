@@ -36,7 +36,7 @@ export class PermissionsService {
     return permission;
   }
 
-  async remove(id: bigint) {
+  async remove(id: number) {
     const permission = this.em.getReference(Permission, id);
     if (!permission) return null;
     await this.em.removeAndFlush(permission);

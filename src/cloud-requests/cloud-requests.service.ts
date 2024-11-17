@@ -36,7 +36,7 @@ export class CloudRequestsService {
     return cloudRequest;
   }
 
-  async remove(id: bigint) {
+  async remove(id: number) {
     const cloudRequest = this.em.getReference(CloudRequest, id);
     if (!cloudRequest) return null;
     await this.em.removeAndFlush(cloudRequest);

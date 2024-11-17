@@ -10,5 +10,5 @@ export class CreateUserDto extends PickType(User, [
   "updatedAt",
   "status",
 ]) {
-  roleId!: bigint;
+  roleId!: number;
 }

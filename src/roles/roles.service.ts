@@ -24,11 +24,11 @@ export class RolesService {
     return this.roleRepository.findAll();
   }
 
-  findOne(id: bigint) {
+  findOne(id: number) {
     return this.em.findOne(Role, id);
   }
 
-  async update(id: bigint, updateRoleDto: UpdateRoleDto) {
+  async update(id: number, updateRoleDto: UpdateRoleDto) {
     const role = await this.findOne(id);
     if (!role) return null;
     wrap(role).assign(updateRoleDto);
@@ -36,7 +36,7 @@ export class RolesService {
     return role;
   }
 
-  async remove(id: bigint) {
+  async remove(id: number) {
     const role = this.em.getReference(Role, id);
     if (!role) return null;
     await this.em.removeAndFlush(role);

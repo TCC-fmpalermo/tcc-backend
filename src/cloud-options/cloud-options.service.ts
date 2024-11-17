@@ -36,7 +36,7 @@ export class CloudOptionsService {
     return cloudOption;
   }
 
-  async remove(id: bigint) {
+  async remove(id: number) {
     const cloudOption = this.em.getReference(CloudOption, id);
     if (!cloudOption) return null;
     await this.em.removeAndFlush(cloudOption);

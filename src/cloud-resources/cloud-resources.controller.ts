@@ -29,6 +29,6 @@ export class CloudResourcesController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.cloudResourcesService.remove(BigInt(id));
+    return this.cloudResourcesService.remove(+id);
   }
 }

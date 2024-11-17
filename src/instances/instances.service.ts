@@ -36,7 +36,7 @@ export class InstancesService {
     return instance;
   }
 
-  async remove(id: bigint) {
+  async remove(id: number) {
     const instance = this.em.getReference(Instance, id);
     if (!instance) return null;
     await this.em.removeAndFlush(instance);

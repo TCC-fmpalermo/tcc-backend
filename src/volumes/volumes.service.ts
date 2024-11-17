@@ -36,7 +36,7 @@ export class VolumesService {
     return volume;
   }
 
-  async remove(id: bigint) {
+  async remove(id: number) {
     const volume = this.em.getReference(Volume, id);
     if (!volume) return null;
     await this.em.removeAndFlush(volume);

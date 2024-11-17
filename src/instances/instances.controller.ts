@@ -29,6 +29,6 @@ export class InstancesController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.instancesService.remove(BigInt(id));
+    return this.instancesService.remove(+id);
   }
 }

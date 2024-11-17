@@ -7,6 +7,9 @@ import { EntityRepository, wrap } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { RolesService } from 'src/roles/roles.service';
 import * as argon2 from 'argon2';
+import * as dayjs from "dayjs";
+import { GetUsersDto } from './dto/get-users.dto';
+
 
 @Injectable()
 export class UsersService {
@@ -39,8 +42,13 @@ export class UsersService {
     return user;
   }
 
-  findAll() {
-    return this.userRepository.findAll();
+  async findAll(): Promise<GetUsersDto[]> {
+    const users = await this.em.find(User, {}, { exclude: ['password'], populate: ['role'] });
+
+    return users.map(user => ({
+      ...user,
+      createdAt: dayjs(user.createdAt).format('DD-MM-YYYY'),
+    }));
   }
 
   findOne(id: number) {
@@ -55,7 +63,7 @@ export class UsersService {
     return user;
   }
 
-  async remove(id: bigint) {
+  async remove(id: number) {
     const user = this.em.getReference(User, id);
     if (!user) return null;
     await this.em.removeAndFlush(user);

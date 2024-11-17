@@ -29,6 +29,6 @@ export class CloudOptionsController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.cloudOptionsService.remove(BigInt(id));
+    return this.cloudOptionsService.remove(+id);
   }
 }
