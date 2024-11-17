@@ -8,7 +8,7 @@ export enum CloudOptionStatus {
 @Entity()
 export class CloudOption {
   @PrimaryKey()
-  id!: bigint;
+  id!: number;
 
   @Property()
   operatingSystem!: string;
@@ -17,7 +17,7 @@ export class CloudOption {
   description?: string;
 
   @Property()
-  size!: bigint;
+  size!: number;
 
   @Property()
   openstackFlavorId!: string;

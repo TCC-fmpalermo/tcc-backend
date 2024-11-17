@@ -3,13 +3,13 @@ import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
 @Entity()
 export class Volume {
   @PrimaryKey()
-  id!: bigint;
+  id!: number;
 
   @Property()
   operatingSystem!: string;
 
   @Property()
-  size!: bigint;
+  size!: number;
 
   @Property()
   openstackVolumeId!: string;

@@ -17,7 +17,7 @@ import { User } from "../../users/entities/user.entity";
   @Entity()
   export class CloudRequest {
     @PrimaryKey()
-    id!: bigint;
+    id!: number;
   
     @ManyToOne(() => User)
     user!: User;

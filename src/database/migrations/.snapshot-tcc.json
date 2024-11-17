@@ -8,12 +8,12 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "serial",
           "unsigned": false,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "operating_system": {
           "name": "operating_system",
@@ -37,12 +37,12 @@
         },
         "size": {
           "name": "size",
-          "type": "bigint",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "openstack_flavor_id": {
           "name": "openstack_flavor_id",
@@ -110,12 +110,22 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "serial",
           "unsigned": false,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
         },
         "ip_address": {
           "name": "ip_address",
@@ -163,6 +173,16 @@
       "indexes": [
         {
           "columnNames": [
+            "name"
+          ],
+          "composite": false,
+          "keyName": "instance_name_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
             "ip_address"
           ],
           "composite": false,
@@ -190,12 +210,12 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "serial",
           "unsigned": false,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "name": {
           "name": "name",
@@ -250,12 +270,12 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "serial",
           "unsigned": false,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "name": {
           "name": "name",
@@ -300,21 +320,21 @@
       "columns": {
         "role_id": {
           "name": "role_id",
-          "type": "bigint",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "permission_id": {
           "name": "permission_id",
-          "type": "bigint",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         }
       },
       "name": "role_permissions",
@@ -367,12 +387,12 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "serial",
           "unsigned": false,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "first_name": {
           "name": "first_name",
@@ -416,12 +436,12 @@
         },
         "role_id": {
           "name": "role_id",
-          "type": "bigint",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "created_at": {
           "name": "created_at",
@@ -504,30 +524,30 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "serial",
           "unsigned": false,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "user_id": {
           "name": "user_id",
-          "type": "bigint",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "cloud_option_id": {
           "name": "cloud_option_id",
-          "type": "bigint",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "status": {
           "name": "status",
@@ -612,12 +632,12 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "serial",
           "unsigned": false,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "operating_system": {
           "name": "operating_system",
@@ -631,12 +651,12 @@
         },
         "size": {
           "name": "size",
-          "type": "bigint",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "openstack_volume_id": {
           "name": "openstack_volume_id",
@@ -681,12 +701,12 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "bigint",
+          "type": "serial",
           "unsigned": false,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "alias": {
           "name": "alias",
@@ -754,30 +774,30 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "bigint",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "instance_id": {
           "name": "instance_id",
-          "type": "bigint",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         },
         "volume_id": {
           "name": "volume_id",
-          "type": "bigint",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "bigint"
+          "mappedType": "integer"
         }
       },
       "name": "cloud_resource",

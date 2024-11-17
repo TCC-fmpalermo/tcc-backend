@@ -17,7 +17,7 @@ import { Role } from "../../roles/entities/role.entity";
   @Entity()
   export class User {
     @PrimaryKey()
-    id!: bigint;
+    id!: number;
   
     @Property()
     firstName!: string;

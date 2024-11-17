@@ -4,7 +4,7 @@ import { Role } from "../../roles/entities/role.entity";
 @Entity()
 export class Permission {
   @PrimaryKey()
-  id!: bigint;
+  id!: number;
 
   @Property()
   @Unique()

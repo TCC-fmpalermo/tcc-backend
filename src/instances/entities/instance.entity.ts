@@ -3,7 +3,11 @@ import { Entity, PrimaryKey, Property, Unique } from "@mikro-orm/core";
 @Entity()
 export class Instance {
   @PrimaryKey()
-  id!: bigint;
+  id!: number;
+
+  @Property()
+  @Unique()
+  name!: string;
 
   @Property()
   @Unique()

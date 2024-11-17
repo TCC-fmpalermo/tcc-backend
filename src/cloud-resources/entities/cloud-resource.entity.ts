@@ -17,7 +17,7 @@ import { Volume } from "../../volumes/entities/volume.entity";
   @Entity()
   export class CloudResource {
     @PrimaryKey()
-    id!: bigint;
+    id!: number;
   
     @Property()
     alias!: string;
