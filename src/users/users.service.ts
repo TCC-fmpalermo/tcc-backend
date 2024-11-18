@@ -5,10 +5,10 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { User } from './entities/user.entity';
 import { EntityRepository, wrap } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
-import { RolesService } from 'src/roles/roles.service';
 import * as argon2 from 'argon2';
 import * as dayjs from "dayjs";
 import { GetUsersDto } from './dto/get-users.dto';
+import { RolesDisplay } from 'src/permissions/role-and-permissions.config';
 
 
 @Injectable()
@@ -16,17 +16,10 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: EntityRepository<User>,
-    private readonly roleService: RolesService,
     private readonly em: EntityManager
   ) {}
 
   async create(createUserDto: CreateUserDto) {    
-    // Busca o role    
-    const role = await this.roleService.findOne(createUserDto.roleId);
-    if (!role) {
-      throw new NotFoundException('Função não encontrada');
-    }
-
     const isEmailUnique = await this.findOneByEmail(createUserDto.email);
     if (isEmailUnique) {
       throw new BadRequestException('E-mail já cadastrado');
@@ -35,7 +28,6 @@ export class UsersService {
     //Cria o usuário e associa o role
     const user = this.userRepository.create({
       ...createUserDto,
-      role: role.id,
       password: await argon2.hash(createUserDto.password),
     });
     await this.em.persistAndFlush(user);
@@ -43,10 +35,11 @@ export class UsersService {
   }
 
   async findAll(): Promise<GetUsersDto[]> {
-    const users = await this.em.find(User, {}, { exclude: ['password'], populate: ['role'] });
+    const users = await this.em.find(User, {}, { exclude: ['password'] });
 
     return users.map(user => ({
       ...user,
+      role: RolesDisplay[user.role],
       createdAt: dayjs(user.createdAt).format('DD-MM-YYYY'),
     }));
   }
@@ -71,6 +64,6 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string) {
-    return this.em.findOne(User, { email }, { populate: ['role', 'role.permissions'] });
+    return this.em.findOne(User, { email });
   }
 }

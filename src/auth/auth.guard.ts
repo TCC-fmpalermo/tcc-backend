@@ -18,18 +18,19 @@ import {
       if (!token) {
         throw new UnauthorizedException();
       }
+
       try {        
-        await this.jwtService.verifyAsync(
+        const payload = await this.jwtService.verifyAsync(
           token,
           {
             secret: process.env.SECRET
           }
         );
-
+        request.user = payload;
+        return true;
       } catch {
         throw new UnauthorizedException();
       }
-      return true;
     }
   
     private extractTokenFromHeader(request: Request): string | undefined {

@@ -3,12 +3,10 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { User } from './entities/user.entity';
-import { RolesModule } from 'src/roles/roles.module';
 
 @Module({
   imports: [
     MikroOrmModule.forFeature([User]),
-    RolesModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

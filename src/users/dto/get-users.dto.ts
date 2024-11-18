@@ -8,7 +8,7 @@ export class GetUsersDto extends PickType(User, [
     'email', 
     'status',
     'updatedAt',
-    'role'
 ]) {
+    role!: string;
     createdAt!: string;
 }
