@@ -3,12 +3,14 @@ import { UsersService } from '../users/users.service';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { UserStatus } from 'src/users/entities/user.entity';
+import { PermissionsService } from 'src/permissions/permissions.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private permissionsService: PermissionsService
   ) {}
 
   async signIn(email: string, password: string): Promise<any> {
@@ -27,6 +29,8 @@ export class AuthService {
     if (!passwordIsValid) {
       throw new UnauthorizedException('E-mail ou senha inválidas');
     }
+
+    const permissions = this.permissionsService.getPermissionsForRole(user.role);
     
     const payload = { 
       id: user.id, 
@@ -34,6 +38,7 @@ export class AuthService {
       lastName: user.lastName, 
       email: user.email, 
       role: user.role, 
+      permissions: permissions,
       status: user.status 
     };
     
