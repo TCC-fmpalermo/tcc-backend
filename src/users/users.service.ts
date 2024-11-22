@@ -2,13 +2,14 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { User } from './entities/user.entity';
+import { User, UserStatus } from './entities/user.entity';
 import { EntityRepository, wrap } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
 import * as argon2 from 'argon2';
 import * as dayjs from "dayjs";
 import { GetUsersDto } from './dto/get-users.dto';
 import { RolesDisplay } from 'src/permissions/role-and-permissions.config';
+import { GetUsersResponseDto } from './dto/get-users-response.dto';
 
 
 @Injectable()
@@ -34,14 +35,38 @@ export class UsersService {
     return user;
   }
 
-  async findAll(): Promise<GetUsersDto[]> {
-    const users = await this.em.find(User, {}, { exclude: ['password'] });
+  async findAll({ search, role, status }: GetUsersDto): Promise<GetUsersResponseDto[]> {
+    const queryBuilder = this.em.createQueryBuilder(User, "user");
+    
+      if (search) {
+        queryBuilder.andWhere(
+          {
+            $or: [
+              { firstName: { $ilike: `%${search}%` } },
+              { lastName: { $ilike: `%${search}%` } },
+              { email: { $ilike: `%${search}%` } },
+            ]
+          }
+        );
+      }
 
-    return users.map(user => ({
-      ...user,
-      role: RolesDisplay[user.role],
-      createdAt: dayjs(user.createdAt).format('DD-MM-YYYY'),
-    }));
+      if (role) {
+        queryBuilder.andWhere({ role: role });
+      }
+
+      if (status) {
+        queryBuilder.andWhere({ status: status });
+      }
+
+      queryBuilder.select('*').addSelect(['user.firstName', 'user.lastName', 'user.email', 'user.role', 'user.createdAt', 'user.status']);
+      
+      const users = await queryBuilder.getResultList();
+
+      return users.map(user => ({
+        ...user,
+        role: RolesDisplay[user.role],
+        createdAt: dayjs(user.createdAt).format('DD-MM-YYYY'),
+      }));
   }
 
   findOne(id: number) {
@@ -65,5 +90,9 @@ export class UsersService {
 
   async findOneByEmail(email: string) {
     return this.em.findOne(User, { email });
+  }
+
+  findAllStatus() {
+    return Object.values(UserStatus);
   }
 }

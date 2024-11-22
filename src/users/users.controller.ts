@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -6,6 +6,7 @@ import { Permissions } from 'src/permissions/permissions.decorator';
 import { Permissions as PermissionTypes } from 'src/permissions/role-and-permissions.config';
 import { RbacGuard } from 'src/auth/guards/rbac.guard';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { GetUsersDto } from './dto/get-users.dto';
 
 @Controller('users')
 @UseGuards(AuthGuard)
@@ -22,8 +23,8 @@ export class UsersController {
   @Get()
   @Permissions(PermissionTypes.VIEW_USERS) // Necessita da permissão 'create_user'
   @UseGuards(RbacGuard)
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query() filters: GetUsersDto) {
+    return this.usersService.findAll(filters);
   }
 
   @Get(':id')
@@ -39,5 +40,10 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @Get('status/all')
+  findAllStatus() {
+    return this.usersService.findAllStatus();
   }
 }
