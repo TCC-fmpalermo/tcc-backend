@@ -58,13 +58,18 @@ export class UsersService {
         queryBuilder.andWhere({ status: status });
       }
 
-      queryBuilder.select('*').addSelect(['user.firstName', 'user.lastName', 'user.email', 'user.role', 'user.createdAt', 'user.status']);
+      queryBuilder.select(['id', 'firstName', 'lastName', 'email', 'role', 'createdAt', 'status'])
+                  .addSelect(['user.firstName', 'user.lastName', 'user.email', 'user.role', 'user.createdAt', 'user.status'])
+                  .orderBy({ createdAt: 'ASC' });
       
       const users = await queryBuilder.getResultList();
 
       return users.map(user => ({
         ...user,
-        role: RolesDisplay[user.role],
+        role: {
+          value: user.role,
+          alias: RolesDisplay[user.role]
+        },
         createdAt: dayjs(user.createdAt).format('DD-MM-YYYY'),
       }));
   }
@@ -75,9 +80,14 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.findOne(id);
-    if (!user) return null;
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    };
+
     wrap(user).assign(updateUserDto);
+
     await this.em.flush();
+    
     return user;
   }
 

@@ -1,5 +1,6 @@
 import { PickType } from "@nestjs/mapped-types";
 import { User } from "../entities/user.entity";
+import { GetRolesResponseDto } from "src/roles/dto/get-roles-response.dto";
 
 export class GetUsersResponseDto extends PickType(User, [
     'id',
@@ -9,6 +10,6 @@ export class GetUsersResponseDto extends PickType(User, [
     'status',
     'updatedAt',
 ]) {
-    role!: string;
+    role!: GetRolesResponseDto;
     createdAt!: string;
 }
