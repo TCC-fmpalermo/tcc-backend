@@ -9,6 +9,7 @@ import { CloudRequestsModule } from './cloud-requests/cloud-requests.module';
 import { CloudResourcesModule } from './cloud-resources/cloud-resources.module';
 import { AuthModule } from './auth/auth.module';
 import { PermissionsModule } from './permissions/permissions.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { PermissionsModule } from './permissions/permissions.module';
     CloudRequestsModule,
     CloudResourcesModule,
     AuthModule,
-    PermissionsModule
+    PermissionsModule,
+    RolesModule
   ],
   controllers: [],
   providers: [],

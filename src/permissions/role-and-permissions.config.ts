@@ -8,11 +8,11 @@ export const Roles = {
 export const RolesDisplay: Record<UserRoles, string> = {
     [UserRoles.USER]: 'Usuário',
     [UserRoles.ADMIN]: 'Administrador',
-  };
+};
   
 export const Permissions = {
-CREATE_USER: 'create_user',
-VIEW_USERS: 'view_users',
+CREATE_USER: 'CREATE_USER',
+VIEW_USERS: 'VIEW_USERS',
 // EDIT_PROFILE: 'edit_profile',
 // CHANGE_STATUS: 'change_status',
 };
