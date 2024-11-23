@@ -5,28 +5,28 @@ import {
     ManyToOne,
     Enum,
   } from "@mikro-orm/core";
-import { CloudOption } from "../../cloud-options/entities/cloud-option.entity";
+import { DesktopOption } from "../../desktop-options/entities/desktop-option.entity";
 import { User } from "../../users/entities/user.entity";
   
-  export enum CloudRequestStatus {
+  export enum DesktopRequestStatus {
     Pendente = 'Pendente',
     Aprovado = 'Aprovado',
     Recusado = 'Recusado',
   }
   
   @Entity()
-  export class CloudRequest {
+  export class DesktopRequest {
     @PrimaryKey()
     id!: number;
   
     @ManyToOne(() => User)
     user!: User;
   
-    @ManyToOne(() => CloudOption)
-    cloudOption!: CloudOption;
+    @ManyToOne(() => DesktopOption)
+    desktopOption!: DesktopOption;
   
-    @Enum(() => CloudRequestStatus)
-    status: CloudRequestStatus = CloudRequestStatus.Pendente;
+    @Enum(() => DesktopRequestStatus)
+    status: DesktopRequestStatus = DesktopRequestStatus.Pendente;
   
     @Property()
     requestedAt = new Date();

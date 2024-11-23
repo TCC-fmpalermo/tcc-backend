@@ -1,12 +1,12 @@
 import { Entity, PrimaryKey, Property, Enum } from "@mikro-orm/core";
 
-export enum CloudOptionStatus {
+export enum DesktopOptionStatus {
   Ativo = 'Ativo',
   Inativo = 'Inativo',
 }
 
 @Entity()
-export class CloudOption {
+export class DesktopOption {
   @PrimaryKey()
   id!: number;
 
@@ -28,7 +28,7 @@ export class CloudOption {
   @Property()
   autoApproved!: boolean;
 
-  @Enum(() => CloudOptionStatus)
-  status: CloudOptionStatus = CloudOptionStatus.Ativo;
+  @Enum(() => DesktopOptionStatus)
+  status: DesktopOptionStatus = DesktopOptionStatus.Ativo;
 }
 

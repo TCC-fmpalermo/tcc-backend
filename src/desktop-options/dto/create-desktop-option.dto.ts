@@ -1,7 +1,7 @@
 import { PickType } from "@nestjs/mapped-types";
-import { CloudOption } from "../entities/cloud-option.entity";
+import { DesktopOption } from "../entities/desktop-option.entity";
 
-export class CreateCloudOptionDto extends PickType(CloudOption, [
+export class CreateDesktopOptionDto extends PickType(DesktopOption, [
   "operatingSystem",
   "description",
   "size",

@@ -88,11 +88,11 @@
           "mappedType": "enum"
         }
       },
-      "name": "cloud_option",
+      "name": "desktop_option",
       "schema": "public",
       "indexes": [
         {
-          "keyName": "cloud_option_pkey",
+          "keyName": "desktop_option_pkey",
           "columnNames": [
             "id"
           ],
@@ -355,8 +355,8 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "cloud_option_id": {
-          "name": "cloud_option_id",
+        "desktop_option_id": {
+          "name": "desktop_option_id",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,
@@ -400,11 +400,11 @@
           "mappedType": "datetime"
         }
       },
-      "name": "cloud_request",
+      "name": "desktop_request",
       "schema": "public",
       "indexes": [
         {
-          "keyName": "cloud_request_pkey",
+          "keyName": "desktop_request_pkey",
           "columnNames": [
             "id"
           ],
@@ -416,28 +416,28 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "cloud_request_user_id_foreign": {
-          "constraintName": "cloud_request_user_id_foreign",
+        "desktop_request_user_id_foreign": {
+          "constraintName": "desktop_request_user_id_foreign",
           "columnNames": [
             "user_id"
           ],
-          "localTableName": "public.cloud_request",
+          "localTableName": "public.desktop_request",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "public.user",
           "updateRule": "cascade"
         },
-        "cloud_request_cloud_option_id_foreign": {
-          "constraintName": "cloud_request_cloud_option_id_foreign",
+        "desktop_request_desktop_option_id_foreign": {
+          "constraintName": "desktop_request_desktop_option_id_foreign",
           "columnNames": [
-            "cloud_option_id"
+            "desktop_option_id"
           ],
-          "localTableName": "public.cloud_request",
+          "localTableName": "public.desktop_request",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.cloud_option",
+          "referencedTableName": "public.desktop_option",
           "updateRule": "cascade"
         }
       },
