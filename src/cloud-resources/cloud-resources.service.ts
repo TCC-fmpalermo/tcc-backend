@@ -5,19 +5,32 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { CloudResource } from './entities/cloud-resource.entity';
 import { EntityRepository, wrap } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
+import { OpenstackService } from 'src/openstack/openstack.service';
+import { DesktopOptionsService } from 'src/desktop-options/desktop-options.service';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class CloudResourcesService {
   constructor(
     @InjectRepository(CloudResource)
     private readonly cloudResourceRepository: EntityRepository<CloudResource>,
+    private readonly desktopOptionsService: DesktopOptionsService,
+    private readonly openstackService: OpenstackService,
     private readonly em: EntityManager
   ) {}
 
-  async create(createCloudResourceDto: CreateCloudResourceDto) {
-    const cloudResource = this.cloudResourceRepository.create(createCloudResourceDto);
-    await this.em.persistAndFlush(cloudResource);
-    return cloudResource;
+  async create({ instanceName, desktopOptionId }: CreateCloudResourceDto, user: User) {
+    const { size, openstackFlavorId, openstackImageId } = await this.desktopOptionsService.findOne(desktopOptionId);
+    
+    const response = await this.openstackService.createEnvironment({
+      instanceName,
+      size,
+      openstackFlavorId,
+      openstackImageId,
+    });
+    // const cloudResource = this.cloudResourceRepository.create(createCloudResourceDto);
+    // await this.em.persistAndFlush(cloudResource);
+    // return cloudResource;
   }
 
   findAll() {

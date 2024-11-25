@@ -613,11 +613,40 @@
           "primary": false,
           "nullable": false,
           "mappedType": "integer"
+        },
+        "desktop_option_id": {
+          "name": "desktop_option_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
         }
       },
       "name": "cloud_resource",
       "schema": "public",
       "indexes": [
+        {
+          "columnNames": [
+            "instance_id"
+          ],
+          "composite": false,
+          "keyName": "cloud_resource_instance_id_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "volume_id"
+          ],
+          "composite": false,
+          "keyName": "cloud_resource_volume_id_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
         {
           "keyName": "cloud_resource_pkey",
           "columnNames": [
@@ -665,6 +694,18 @@
             "id"
           ],
           "referencedTableName": "public.volume",
+          "updateRule": "cascade"
+        },
+        "cloud_resource_desktop_option_id_foreign": {
+          "constraintName": "cloud_resource_desktop_option_id_foreign",
+          "columnNames": [
+            "desktop_option_id"
+          ],
+          "localTableName": "public.cloud_resource",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.desktop_option",
           "updateRule": "cascade"
         }
       },

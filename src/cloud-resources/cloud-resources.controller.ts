@@ -1,15 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { CloudResourcesService } from './cloud-resources.service';
 import { CreateCloudResourceDto } from './dto/create-cloud-resource.dto';
 import { UpdateCloudResourceDto } from './dto/update-cloud-resource.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('cloud-resources')
+@UseGuards(AuthGuard)
 export class CloudResourcesController {
   constructor(private readonly cloudResourcesService: CloudResourcesService) {}
 
   @Post()
-  create(@Body() createCloudResourceDto: CreateCloudResourceDto) {
-    return this.cloudResourcesService.create(createCloudResourceDto);
+  create(@Req() request, @Body() createCloudResourceDto: CreateCloudResourceDto) {
+    return this.cloudResourcesService.create(createCloudResourceDto, request.user);
   }
 
   @Get()

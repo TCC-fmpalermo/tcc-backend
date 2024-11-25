@@ -7,13 +7,14 @@ import { EntityRepository, wrap } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { OpenstackService } from 'src/openstack/openstack.service';
 import { GetDesktopOptionResponseDto } from './dto/get-desktop-option-response.dto';
+import { ComputeService } from 'src/openstack/compute/compute.service';
 
 @Injectable()
 export class DesktopOptionsService {
   constructor(
     @InjectRepository(DesktopOption)
     private readonly desktopOptionRepository: EntityRepository<DesktopOption>,
-    private readonly openstackService: OpenstackService,
+    private readonly computeService: ComputeService,
     private readonly em: EntityManager,
   ) {}
 
@@ -28,7 +29,7 @@ export class DesktopOptionsService {
 
     if (!desktopOptions) return [];
 
-    const flavors = await this.openstackService.getFlavorsDetails();
+    const flavors = await this.computeService.getFlavorsDetails();
 
     return desktopOptions.map((desktopOption) => {
       return {
@@ -40,7 +41,7 @@ export class DesktopOptionsService {
   }
 
   findOne(id: number) {
-    return this.em.findOne(DesktopOption, id);
+    return this.em.findOne(DesktopOption, { id: id });
   }
 
   async update(id: number, updateDesktopOptionDto: UpdateDesktopOptionDto) {

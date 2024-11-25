@@ -11,6 +11,7 @@ import { OpenstackModule } from 'src/openstack/openstack.module';
     OpenstackModule
   ],
   controllers: [DesktopOptionsController],
-  providers: [DesktopOptionsService]
+  providers: [DesktopOptionsService],
+  exports: [DesktopOptionsService]
 })
 export class DesktopOptionsModule {}

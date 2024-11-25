@@ -4,10 +4,12 @@ import {
     Property,
     ManyToOne,
     Enum,
+    OneToOne,
   } from "@mikro-orm/core";
 import { Instance } from "../../instances/entities/instance.entity";
 import { User } from "../../users/entities/user.entity";
 import { Volume } from "../../volumes/entities/volume.entity";
+import { DesktopOption } from "../../desktop-options/entities/desktop-option.entity";
   
   export enum CloudResourceStatus {
     Ativo = 'Ativo',
@@ -40,10 +42,13 @@ import { Volume } from "../../volumes/entities/volume.entity";
     @ManyToOne(() => User)
     user!: User;
   
-    @ManyToOne(() => Instance)
+    @OneToOne(() => Instance)
     instance!: Instance;
   
-    @ManyToOne(() => Volume)
+    @OneToOne(() => Volume)
     volume!: Volume;
+
+    @ManyToOne(() => DesktopOption)
+    desktopOption!: DesktopOption
   }
   
