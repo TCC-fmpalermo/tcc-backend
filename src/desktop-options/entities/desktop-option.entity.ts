@@ -10,6 +10,9 @@ export class DesktopOption {
   @PrimaryKey()
   id!: number;
 
+  @Property({ default: 'ubuntu' })
+  defaultUsername!: string;
+
   @Property({ nullable: true })
   description?: string;
 

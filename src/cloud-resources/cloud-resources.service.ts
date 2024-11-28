@@ -29,7 +29,8 @@ export class CloudResourcesService {
     const { 
       size, 
       openstackFlavorId, 
-      openstackImageId, 
+      openstackImageId,
+      defaultUsername
     } = await this.desktopOptionsService.findOne(desktopOptionId);
 
     const instanceName = 'instance-' + Date.now();
@@ -46,7 +47,7 @@ export class CloudResourcesService {
     const instance = await this.instancesService.create({
       name: instanceName,
       openstackInstanceId: newEnvironment.instanceId,
-      username: "ubuntu",
+      username: defaultUsername,
       password: password,
       ipAddress: newEnvironment.ipAddress,
       openstackNetworkId: newEnvironment.networkId

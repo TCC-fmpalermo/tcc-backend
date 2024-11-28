@@ -19,7 +19,8 @@ export class GetDesktopOptionResponseDto extends PickType(DesktopOption, [
     'openstackFlavorId',
     'openstackImageId',
     'autoApproved',
-    'status'
+    'status',
+    'defaultUsername'
 ]){
     size: string;
     flavorSpecs: FlavorSpecs;

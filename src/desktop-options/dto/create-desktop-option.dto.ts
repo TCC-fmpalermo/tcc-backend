@@ -8,4 +8,5 @@ export class CreateDesktopOptionDto extends PickType(DesktopOption, [
   "openstackImageId",
   "autoApproved",
   "status",
+  "defaultUsername",
 ]) {}

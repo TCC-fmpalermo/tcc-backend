@@ -15,6 +15,17 @@
           "nullable": false,
           "mappedType": "integer"
         },
+        "default_username": {
+          "name": "default_username",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "default": "'ubuntu'",
+          "mappedType": "string"
+        },
         "description": {
           "name": "description",
           "type": "varchar(255)",
@@ -451,15 +462,6 @@
           "unsigned": false,
           "autoincrement": true,
           "primary": true,
-          "nullable": false,
-          "mappedType": "integer"
-        },
-        "size": {
-          "name": "size",
-          "type": "int",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
           "nullable": false,
           "mappedType": "integer"
         },
