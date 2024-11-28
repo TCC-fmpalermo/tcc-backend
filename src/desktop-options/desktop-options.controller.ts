@@ -27,6 +27,11 @@ export class DesktopOptionsController {
     return this.desktopOptionsService.findAllFlavors();
   }
 
+  @Get('/status/all')
+  findAllStatus() {
+    return this.desktopOptionsService.findAllStatus();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.desktopOptionsService.findOne(+id);

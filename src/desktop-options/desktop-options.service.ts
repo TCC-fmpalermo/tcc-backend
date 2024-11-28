@@ -57,6 +57,10 @@ export class DesktopOptionsService {
     return await this.computeService.getFlavorsDetails();
   }
 
+  async findAllStatus() {
+    return Object.values(DesktopOptionStatus);
+  }
+
   findOne(id: number) {
     return this.em.findOne(DesktopOption, { id: id });
   }
