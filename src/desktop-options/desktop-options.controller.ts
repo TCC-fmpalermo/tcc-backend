@@ -9,8 +9,6 @@ export class DesktopOptionsController {
 
   @Post()
   create(@Body() createDesktopOptionDto: CreateDesktopOptionDto) {
-    console.log(createDesktopOptionDto);
-    
     return this.desktopOptionsService.create(createDesktopOptionDto);
   }
 
