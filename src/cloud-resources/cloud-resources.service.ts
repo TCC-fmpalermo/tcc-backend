@@ -30,7 +30,6 @@ export class CloudResourcesService {
       size, 
       openstackFlavorId, 
       openstackImageId, 
-      operatingSystem 
     } = await this.desktopOptionsService.findOne(desktopOptionId);
 
     const instanceName = 'instance-' + Date.now();
@@ -54,7 +53,6 @@ export class CloudResourcesService {
     });
 
     const volume = await this.volumesService.create({
-      operatingSystem: operatingSystem,
       openstackVolumeId: newEnvironment.volumeId,
       size: size,
       openstackImageId: openstackImageId,

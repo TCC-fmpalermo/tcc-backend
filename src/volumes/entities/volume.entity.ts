@@ -6,9 +6,6 @@ export class Volume {
   id!: number;
 
   @Property()
-  operatingSystem!: string;
-
-  @Property()
   size!: number;
 
   @Property()

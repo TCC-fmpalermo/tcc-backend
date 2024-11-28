@@ -8,9 +8,13 @@ type FlavorSpecs = {
     ram: string;
 }
 
+type ImageInfo = {
+    id: string;
+    name: string;
+    size: string;
+}
 export class GetDesktopOptionResponseDto extends PickType(DesktopOption, [
     'id', 
-    'operatingSystem',
     'description',
     'openstackFlavorId',
     'openstackImageId',
@@ -19,4 +23,5 @@ export class GetDesktopOptionResponseDto extends PickType(DesktopOption, [
 ]){
     size: string;
     flavorSpecs: FlavorSpecs;
+    imageInfo: ImageInfo;
 }

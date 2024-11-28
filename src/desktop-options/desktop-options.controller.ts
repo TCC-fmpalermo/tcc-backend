@@ -19,6 +19,16 @@ export class DesktopOptionsController {
     return this.desktopOptionsService.findAll();
   }
 
+  @Get('/images')
+  findAllImages() {
+    return this.desktopOptionsService.findAllImages();
+  }
+
+  @Get('/flavors')
+  findAllFlavors() {
+    return this.desktopOptionsService.findAllFlavors();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.desktopOptionsService.findOne(+id);

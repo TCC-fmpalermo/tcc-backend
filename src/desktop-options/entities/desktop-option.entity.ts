@@ -10,9 +10,6 @@ export class DesktopOption {
   @PrimaryKey()
   id!: number;
 
-  @Property()
-  operatingSystem!: string;
-
   @Property({ nullable: true })
   description?: string;
 

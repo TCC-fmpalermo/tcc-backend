@@ -18,7 +18,6 @@ export class ComputeService {
     ) {}
 
     async getFlavorsDetails() {
-        await this.identityService.authenticate();
         const token = this.identityService.getToken();
         const response = await firstValueFrom(
             this.httpService.get(
@@ -30,6 +29,11 @@ export class ComputeService {
                 },
             ),
         );
+        
+        if(response.data.flavors.length === 0) {
+            throw new NotFoundException('Nenhuma flavor encontrada');
+        }
+
         return response.data.flavors.map((flavor) => {
             return {
                 id: flavor.id,

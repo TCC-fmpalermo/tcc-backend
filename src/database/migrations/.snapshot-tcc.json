@@ -15,16 +15,6 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "operating_system": {
-          "name": "operating_system",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
         "description": {
           "name": "description",
           "type": "varchar(255)",
@@ -463,16 +453,6 @@
           "primary": true,
           "nullable": false,
           "mappedType": "integer"
-        },
-        "operating_system": {
-          "name": "operating_system",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
         },
         "size": {
           "name": "size",
