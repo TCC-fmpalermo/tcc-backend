@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { IdentityService } from '../identity/identity.service';
 import { ComputeService } from '../compute/compute.service';
+import { createFloatingIpDto, createFloatingIpResponseDto } from './network.dto';
 
 @Injectable()
 export class NetworkService {
@@ -111,7 +112,7 @@ export class NetworkService {
         }
     }
 
-    async createFloatingIp(instanceId: string): Promise<string> {
+    async createFloatingIp({ instanceId }: createFloatingIpDto): Promise<createFloatingIpResponseDto> {
         const token = this.identityService.getToken();
         const portId = await this.computeService.getPortIdFromInstance(instanceId);
 
@@ -131,7 +132,10 @@ export class NetworkService {
                 },
             ),
         );
-        return response.data.floatingip.id;
+        return {
+            id: response.data.floatingip.id,
+            ipAddress: response.data.floatingip.floating_ip_address
+        };
     }
 
     async deleteFloatingIp(floatingIpId: string): Promise<void> {

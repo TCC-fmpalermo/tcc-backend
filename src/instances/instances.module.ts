@@ -7,6 +7,7 @@ import { Instance } from './entities/instance.entity';
 @Module({
   imports: [MikroOrmModule.forFeature([Instance])],
   controllers: [InstancesController],
-  providers: [InstancesService]
+  providers: [InstancesService],
+  exports: [InstancesService],
 })
 export class InstancesModule {}

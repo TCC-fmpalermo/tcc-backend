@@ -3,9 +3,11 @@ import { NetworkService } from './network/network.service';
 import { IdentityService } from './/identity/identity.service';
 import { ComputeService } from './compute/compute.service';
 import { VolumeService } from './volume/volume.service';
+import { createFloatingIpResponseDto } from './network/network.dto';
 
 interface CreateEnvironmentDto {
     instanceName: string;
+    password: string;
     size: number;
     openstackFlavorId: string;
     openstackImageId: string;
@@ -55,6 +57,7 @@ export class OpenstackService {
 
     async createEnvironment({ 
         instanceName, 
+        password,
         size, 
         openstackFlavorId, 
         openstackImageId 
@@ -64,7 +67,7 @@ export class OpenstackService {
         let portId: string;
         let volumeId: string;
         let instanceId: string;
-        let floatingipId: string;
+        let floatingip: createFloatingIpResponseDto;
 
         try {
             await this.identityService.authenticate();
@@ -81,23 +84,29 @@ export class OpenstackService {
 
             await this.volumeService.waitForVolumeToBeAvailable(volumeId);
 
-            instanceId = await this.computeService.createInstance(instanceName, openstackFlavorId, volumeId, networkId);
+            instanceId = await this.computeService.createInstance(instanceName, password, openstackFlavorId, volumeId, networkId);
 
             await this.computeService.waitForInstanceToBeReady(instanceId);
 
-            floatingipId = await this.networkService.createFloatingIp(instanceId);
+            floatingip = await this.networkService.createFloatingIp({instanceId});
 
-            await this.rollbackEnvironment(networkId, subnetId, portId, volumeId, instanceId, floatingipId);
+            // await this.rollbackEnvironment(networkId, subnetId, portId, volumeId, instanceId, floatingipId);
 
-            return 'Ambiente criado com sucesso!';
+            return {
+                instanceId,
+                ipAddress: floatingip?.ipAddress,
+                volumeId
+            };
         } catch (error) {
             console.error('Erro durante a criação do ambiente:', error?.response?.data);
 
             console.log('Erro durante a criação do ambiente:', error);
 
-            await this.rollbackEnvironment(networkId, subnetId, portId, volumeId, instanceId, floatingipId);
+            await this.rollbackEnvironment(networkId, subnetId, portId, volumeId, instanceId, floatingip?.id);
             
             throw new Error(error);
         }
     }
+
+    // async deleteEnvironment()
 }

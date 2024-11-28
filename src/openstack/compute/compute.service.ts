@@ -2,9 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { IdentityService } from '../identity/identity.service';
+import { randomBytes } from 'crypto';
+
 
 @Injectable()
 export class ComputeService {
+    private readonly compute_url = process.env.OPENSTACK_COMPUTE_URL;
+    private readonly project_id = process.env.OPENSTACK_IDENTITY_PROJECT_ID;
+    private readonly guacamole_instance_id = process.env.OPENSTACK_GUACAMOLE_INSTANCE_ID;
+    private readonly charset = process.env.OPENSTACK_PASSWORD_CHARSET;
+
     constructor(
         private readonly httpService: HttpService, 
         private readonly identityService: IdentityService
@@ -15,7 +22,7 @@ export class ComputeService {
         const token = this.identityService.getToken();
         const response = await firstValueFrom(
             this.httpService.get(
-                `${process.env.OPENSTACK_COMPUTE_URL}/v2.1/flavors/detail?project_id=${process.env.OPENSTACK_IDENTITY_PROJECT_ID}`,
+                `${this.compute_url}/v2.1/flavors/detail?project_id=${this.project_id}`,
                 {
                     headers: {
                         'X-Auth-Token': token,
@@ -35,10 +42,10 @@ export class ComputeService {
 
     async createNetworkInterface(networkId: string) {
         const token = this.identityService.getToken();
-        const guacamoleInstanceId = process.env.OPENSTACK_GUACAMOLE_INSTANCE_ID;
+        const guacamoleInstanceId = this.guacamole_instance_id;
         const response = await firstValueFrom(
             this.httpService.post(
-                `${process.env.OPENSTACK_COMPUTE_URL}/v2.1/servers/${guacamoleInstanceId}/os-interface`,
+                `${this.compute_url}/v2.1/servers/${guacamoleInstanceId}/os-interface`,
                 {
                     interfaceAttachment: {
                         net_id: networkId,
@@ -56,10 +63,10 @@ export class ComputeService {
 
     async deleteNetworkInterface(portId: string) {
         const token = this.identityService.getToken();
-        const guacamoleInstanceId = process.env.OPENSTACK_GUACAMOLE_INSTANCE_ID;
+        const guacamoleInstanceId = this.guacamole_instance_id;
         await firstValueFrom(
             this.httpService.delete(
-                `${process.env.OPENSTACK_COMPUTE_URL}/v2.1/servers/${guacamoleInstanceId}/os-interface/${portId}`,
+                `${this.compute_url}/v2.1/servers/${guacamoleInstanceId}/os-interface/${portId}`,
                 {
                     headers: {
                         'X-Auth-Token': token,
@@ -69,11 +76,14 @@ export class ComputeService {
         );
     }
 
-    async createInstance(instanceName: string, flavorId: string, volumeId: string, networkId: string) {
+    async createInstance(instanceName: string, password: string, flavorId: string, volumeId: string, networkId: string) {
         const token = this.identityService.getToken();
+
+        const userDataScript = this.generateUserDataScript(password);
+
         const response = await firstValueFrom(
             this.httpService.post(
-                `${process.env.OPENSTACK_COMPUTE_URL}/v2.1/servers`,
+                `${this.compute_url}/v2.1/servers`,
                 {
                     server: {
                         name: instanceName,
@@ -100,7 +110,8 @@ export class ComputeService {
                                 uuid: networkId,
                             }
                         ],
-                        key_name: "guacd"
+                        key_name: "guacd",
+                        user_data: userDataScript
                     },
                 },
                 {
@@ -117,7 +128,7 @@ export class ComputeService {
         const token = this.identityService.getToken();
         const response = await firstValueFrom(
             this.httpService.get(
-                `${process.env.OPENSTACK_COMPUTE_URL}/v2.1/servers/${instanceId}`,
+                `${this.compute_url}/v2.1/servers/${instanceId}`,
                 {
                     headers: {
                         'X-Auth-Token': token,
@@ -153,7 +164,7 @@ export class ComputeService {
         const token = this.identityService.getToken();
         await firstValueFrom(
             this.httpService.delete(
-                `${process.env.OPENSTACK_COMPUTE_URL}/v2.1/servers/${instanceId}`,
+                `${this.compute_url}/v2.1/servers/${instanceId}`,
                 {
                     headers: {
                         'X-Auth-Token': token,
@@ -168,7 +179,7 @@ export class ComputeService {
         const token = this.identityService.getToken();
         const response = await firstValueFrom(
             this.httpService.get(
-                `${process.env.OPENSTACK_COMPUTE_URL}/v2.1/servers/${instanceId}/os-interface`,
+                `${this.compute_url}/v2.1/servers/${instanceId}/os-interface`,
                 {
                     headers: {
                         'X-Auth-Token': token,
@@ -177,5 +188,22 @@ export class ComputeService {
             ),
         );
         return response.data.interfaceAttachments[0].port_id;
+    }
+
+
+    generatePassword(length: number): string {
+        const bytes = randomBytes(length);
+        const password = Array.from(bytes)
+          .map(byte => this.charset[byte % this.charset.length])
+          .join('');
+        return password;
+    }
+
+    generateUserDataScript(password: string): string {
+        const script = `#!/bin/bash
+        echo "ubuntu:${password}" | chpasswd
+        `;
+
+        return Buffer.from(script).toString('base64')
     }
 }

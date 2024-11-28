@@ -7,6 +7,7 @@ import { Volume } from './entities/volume.entity';
 @Module({
   imports: [MikroOrmModule.forFeature([Volume])],
   controllers: [VolumesController],
-  providers: [VolumesService]
+  providers: [VolumesService],
+  exports: [VolumesService],
 })
 export class VolumesModule {}

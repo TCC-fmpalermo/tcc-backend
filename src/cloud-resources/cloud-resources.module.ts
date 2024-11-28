@@ -5,12 +5,16 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { CloudResource } from './entities/cloud-resource.entity';
 import { OpenstackModule } from 'src/openstack/openstack.module';
 import { DesktopOptionsModule } from 'src/desktop-options/desktop-options.module';
+import { InstancesModule } from 'src/instances/instances.module';
+import { VolumesModule } from 'src/volumes/volumes.module';
 
 @Module({
   imports: [
     MikroOrmModule.forFeature([CloudResource]),
     DesktopOptionsModule,
-    OpenstackModule
+    OpenstackModule,
+    InstancesModule,
+    VolumesModule
   ],
   controllers: [CloudResourcesController],
   providers: [CloudResourcesService]

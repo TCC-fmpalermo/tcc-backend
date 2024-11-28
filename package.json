@@ -33,12 +33,14 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^9.0.0",
+    "@types/uuid": "^10.0.0",
     "argon2": "^0.41.1",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.0",
     "dayjs": "^1.11.13",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@mikro-orm/cli": "^6.3.13",
