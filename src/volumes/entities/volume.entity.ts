@@ -6,9 +6,6 @@ export class Volume {
   id!: number;
 
   @Property()
-  size!: number;
-
-  @Property()
   openstackVolumeId!: string;
 
   @Property()

@@ -10,6 +10,7 @@ import { GetDesktopOptionResponseDto } from './dto/get-desktop-option-response.d
 import { ComputeService } from 'src/openstack/compute/compute.service';
 import { ImageService } from 'src/openstack/image/image.service';
 import { IdentityService } from 'src/openstack/identity/identity.service';
+import { GetDesktopOptionDto } from './dto/get-desktop-option.dto';
 
 @Injectable()
 export class DesktopOptionsService {
@@ -28,8 +29,10 @@ export class DesktopOptionsService {
     return desktopOption;
   }
 
-  async findAll(): Promise<GetDesktopOptionResponseDto[]> {
-    let desktopOptions = await this.em.find(DesktopOption, { status: DesktopOptionStatus.Ativo }, { orderBy: { id: 'ASC' } });
+  async findAll({ status }: GetDesktopOptionDto): Promise<GetDesktopOptionResponseDto[]> {
+    const whereCondition = status ? { status } : {};
+
+    let desktopOptions = await this.em.find(DesktopOption, whereCondition, { orderBy: { id: 'ASC' } });
 
     if (!desktopOptions) return [];
 

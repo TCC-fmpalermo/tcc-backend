@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { CreateDesktopOptionDto } from './dto/create-desktop-option.dto';
 import { UpdateDesktopOptionDto } from './dto/update-desktop-option.dto';
 import { DesktopOptionsService } from './desktop-options.service';
+import { GetDesktopOptionDto } from './dto/get-desktop-option.dto';
 
 @Controller('desktop-options')
 export class DesktopOptionsController {
@@ -13,8 +14,8 @@ export class DesktopOptionsController {
   }
 
   @Get()
-  findAll() {
-    return this.desktopOptionsService.findAll();
+  findAll(@Query() filters: GetDesktopOptionDto) {
+    return this.desktopOptionsService.findAll(filters);
   }
 
   @Get('/images')

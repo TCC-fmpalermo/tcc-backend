@@ -54,7 +54,6 @@ export class CloudResourcesService {
 
     const volume = await this.volumesService.create({
       openstackVolumeId: newEnvironment.volumeId,
-      size: size,
       openstackImageId: openstackImageId,
     });
 
