@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { IdentityService } from '../identity/identity.service';
@@ -175,7 +175,7 @@ export class ComputeService {
 
     }
 
-    async getPortIdFromInstance(instanceId: string) {
+    async getPortInterfacesFromInstance(instanceId: string) {
         const token = this.identityService.getToken();
         const response = await firstValueFrom(
             this.httpService.get(
@@ -187,7 +187,12 @@ export class ComputeService {
                 },
             ),
         );
-        return response.data.interfaceAttachments[0].port_id;
+
+        if(response.data.interfaceAttachments.length === 0) {
+            throw new NotFoundException('Nenhuma interface de rede encontrada');
+        }
+
+        return response.data.interfaceAttachments;
     }
 
 

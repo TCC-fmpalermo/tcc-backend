@@ -7,4 +7,5 @@ export class CreateInstanceDto extends PickType(Instance, [
   "username",
   "password",
   "openstackInstanceId",
+  "openstackNetworkId",
 ]) {}

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCloudResourceDto } from './dto/create-cloud-resource.dto';
 import { UpdateCloudResourceDto } from './dto/update-cloud-resource.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
@@ -50,6 +50,7 @@ export class CloudResourcesService {
       username: "ubuntu",
       password: password,
       ipAddress: newEnvironment.ipAddress,
+      openstackNetworkId: newEnvironment.networkId
     });
 
     const volume = await this.volumesService.create({
@@ -77,7 +78,7 @@ export class CloudResourcesService {
   }
 
   findOne(id: number) {
-    return this.em.findOne(CloudResource, id);
+    return this.em.findOne(CloudResource, id, { populate: ['instance', 'volume', 'desktopOption'] });
   }
 
   async update(id: number, updateCloudResourceDto: UpdateCloudResourceDto) {
@@ -89,9 +90,22 @@ export class CloudResourcesService {
   }
 
   async remove(id: number) {
-    const cloudResource = this.em.getReference(CloudResource, id);
-    if (!cloudResource) return null;
+    const cloudResource = await this.findOne(id);
+    
+    if (!cloudResource) throw new NotFoundException('Desktop não encontrado');
+
+    await this.openstackService.deleteEnvironment({
+      instanceId: cloudResource.instance.openstackInstanceId,
+      ipAddress: cloudResource.instance.ipAddress,
+      networkId: cloudResource.instance.openstackNetworkId,
+      volumeId: cloudResource.volume.openstackVolumeId
+    });
+
     await this.em.removeAndFlush(cloudResource);
+
+    await this.instancesService.remove(cloudResource.instance.id);
+    await this.volumesService.remove(cloudResource.volume.id);
+
     return cloudResource;
   }
 }

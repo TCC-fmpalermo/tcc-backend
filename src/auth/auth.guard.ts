@@ -16,7 +16,7 @@ import {
       const token = this.extractTokenFromHeader(request);
       
       if (!token) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException("Usuário não autenticado");
       }
 
       try {        
@@ -29,7 +29,7 @@ import {
         request.user = payload;
         return true;
       } catch {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException("Usuário não autenticado");
       }
     }
   

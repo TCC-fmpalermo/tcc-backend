@@ -38,7 +38,7 @@ export class VolumesService {
 
   async remove(id: number) {
     const volume = this.em.getReference(Volume, id);
-    if (!volume) return null;
+    if (!volume) throw new Error('Volume não encontrado');
     await this.em.removeAndFlush(volume);
     return volume;
   }

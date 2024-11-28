@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { IdentityService } from '../identity/identity.service';
@@ -55,6 +55,26 @@ export class NetworkService {
         );
         
         return response.data.subnet.id;
+    }
+
+    async getSubnets(network_id?: string): Promise<any> {
+        const token = this.identityService.getToken();
+        const response = await firstValueFrom(
+            this.httpService.get(
+                `${process.env.OPENSTACK_NETWORK_URL}/v2.0/subnets?network_id=${network_id}`,
+                {
+                    headers: {
+                        'X-Auth-Token': token,
+                    },
+                },
+            ),
+        );
+
+        if(response.data.subnets.length === 0) {
+            throw new NotFoundException('Nenhuma sub-rede encontrada');
+        }
+
+        return response.data.subnets;
     }
 
     async addRouterInterface(subnetId: string): Promise<void> {
@@ -114,7 +134,8 @@ export class NetworkService {
 
     async createFloatingIp({ instanceId }: createFloatingIpDto): Promise<createFloatingIpResponseDto> {
         const token = this.identityService.getToken();
-        const portId = await this.computeService.getPortIdFromInstance(instanceId);
+        const portInterfaces = await this.computeService.getPortInterfacesFromInstance(instanceId);
+        const portId = portInterfaces[0].port_id;
 
         const response = await firstValueFrom(
             this.httpService.post(
@@ -150,5 +171,25 @@ export class NetworkService {
                 },
             ),
         );
+    }
+
+    async getFloatingIpIdByIpAddress(ipAddress: string): Promise<string> {
+        const token = this.identityService.getToken();
+        const response = await firstValueFrom(
+            this.httpService.get(
+                `${process.env.OPENSTACK_NETWORK_URL}/v2.0/floatingips?floating_ip_address=${ipAddress}`,
+                {
+                    headers: {
+                        'X-Auth-Token': token,
+                    },
+                },
+            ),
+        );
+
+        if(response.data.floatingips.length === 0) {
+            throw new NotFoundException('IP Flutuante não encontrado');
+        }
+
+        return response.data.floatingips[0].id;
     }
 }

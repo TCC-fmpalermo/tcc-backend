@@ -38,7 +38,7 @@ export class InstancesService {
 
   async remove(id: number) {
     const instance = this.em.getReference(Instance, id);
-    if (!instance) return null;
+    if (!instance) throw new Error('Instância não encontrada');
     await this.em.removeAndFlush(instance);
     return instance;
   }

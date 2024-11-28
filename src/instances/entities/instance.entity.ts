@@ -20,6 +20,9 @@ export class Instance {
   password!: string;
 
   @Property()
+  openstackNetworkId!: string;
+
+  @Property()
   openstackInstanceId!: string;
 }
 

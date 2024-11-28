@@ -157,6 +157,16 @@
           "length": 255,
           "mappedType": "string"
         },
+        "openstack_network_id": {
+          "name": "openstack_network_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
         "openstack_instance_id": {
           "name": "openstack_instance_id",
           "type": "varchar(255)",
