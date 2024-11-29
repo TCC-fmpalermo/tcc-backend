@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Res, Query } from '@nestjs/common';
 import { CloudResourcesService } from './cloud-resources.service';
 import { CreateCloudResourceDto } from './dto/create-cloud-resource.dto';
 import { UpdateCloudResourceDto } from './dto/update-cloud-resource.dto';
@@ -15,8 +15,19 @@ export class CloudResourcesController {
   ) {}
 
   @Post()
-  create(@Req() request, @Body() createCloudResourceDto: CreateCloudResourceDto) {
+
+  create(@Req() request: Request, @Body() createCloudResourceDto: CreateCloudResourceDto) {
     return this.cloudResourcesService.create(createCloudResourceDto, request.user);
+  }
+  
+  @Get()
+  findAll() {
+    return this.cloudResourcesService.findAll();
+  }
+
+  @Get('mine')
+  findUserCloudResources(@Req() req: Request) {
+    return this.cloudResourcesService.findUserCloudResources(req.user.id);
   }
 
   @Get('progress')
@@ -34,15 +45,9 @@ export class CloudResourcesController {
     });
   }
 
-  
-  @Get()
-  findAll() {
-    return this.cloudResourcesService.findAll();
-  }
-
-  @Get('mine')
-  findUserCloudResources(@Req() req: Request) {
-    return this.cloudResourcesService.findUserCloudResources(req.user.id);
+  @Get(':id/token')
+  getGuacamoleToken(@Req() req: Request, @Param('id') id: string) {
+    return this.cloudResourcesService.getGuacamoleToken(+id, req.user);
   }
 
   @Patch(':id')

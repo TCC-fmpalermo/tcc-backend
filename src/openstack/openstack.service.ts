@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { NetworkService } from './network/network.service';
 import { IdentityService } from './/identity/identity.service';
 import { ComputeService } from './compute/compute.service';
@@ -72,17 +72,19 @@ export class OpenstackService {
                 volumeId
             };
         } catch (error) {
+            this.progressService.sendProgress(userId, 0, 'Erro durante a criação do ambiente...');
             console.error('Erro durante a criação do ambiente:', error?.response?.data);
 
             console.log('Erro durante a criação do ambiente:', error);
 
-            await this.rollbackEnvironment(networkId, subnetId, portId, volumeId, instanceId, floatingip?.id);
+            await this.rollbackEnvironment(userId, networkId, subnetId, portId, volumeId, instanceId, floatingip?.id);
             
-            throw new Error(error);
+            throw new InternalServerErrorException(error);
         }
     }
 
     async rollbackEnvironment(
+        userId: number,
         networkId: string, 
         subnetId: string, 
         portId: string, 
@@ -91,26 +93,33 @@ export class OpenstackService {
         floatingipId: string
     ) {
 
+        this.progressService.sendProgress(userId, 10, 'Deletando ambiente...');
         if(floatingipId) {
+            this.progressService.sendProgress(userId, 20, 'Deletando IP flutuante...');
             await this.networkService.deleteFloatingIp(floatingipId);
         }
         if(instanceId) {
+            this.progressService.sendProgress(userId, 30, 'Deletando instância...');
             await this.computeService.deleteInstance(instanceId);
         }
         if(volumeId) {
-            await this.volumeService.waitForVolumeToBeAvailable(volumeId);
+            this.progressService.sendProgress(userId, 50, 'Deletando volume...');
+            await this.volumeService.waitForDeleteVolume(volumeId);
             await this.volumeService.deleteVolume(volumeId);
         }
 
         if(portId) {
+            this.progressService.sendProgress(userId, 80, 'Deletando interface de roteamento...');
             await this.computeService.deleteNetworkInterface(portId);
         }
 
         if(subnetId) {
+
             await this.networkService.removeRouterInterface(subnetId);
         }
 
         if (networkId) {
+            this.progressService.sendProgress(userId, 100, 'Deletando rede...');
             await this.networkService.deleteNetwork(networkId);
         }
     }

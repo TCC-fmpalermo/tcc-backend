@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCloudResourceDto } from './dto/create-cloud-resource.dto';
 import { UpdateCloudResourceDto } from './dto/update-cloud-resource.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { CloudResource } from './entities/cloud-resource.entity';
+import { CloudResource, CloudResourceStatus } from './entities/cloud-resource.entity';
 import { EntityRepository, wrap } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { OpenstackService } from 'src/openstack/openstack.service';
@@ -12,11 +12,10 @@ import { InstancesService } from 'src/instances/instances.service';
 import { VolumesService } from 'src/volumes/volumes.service';
 import { ComputeService } from 'src/openstack/compute/compute.service';
 import { ImageService } from 'src/openstack/image/image.service';
-import { VolumeService } from 'src/openstack/volume/volume.service';
 import { IdentityService } from 'src/openstack/identity/identity.service';
 import * as dayjs from "dayjs";
-import { last } from 'rxjs';
 import { chooseMBorGB } from 'src/utils/formatBytes';
+import { GuacamoleService } from 'src/instances/guacamole/guacamole.service';
 
 @Injectable()
 export class CloudResourcesService {
@@ -28,9 +27,9 @@ export class CloudResourcesService {
     private readonly identityService: IdentityService,
     private readonly computeService: ComputeService,
     private readonly imageService: ImageService,
-    private readonly volumeService: VolumeService,
     private readonly instancesService: InstancesService,
     private readonly volumesService: VolumesService,
+    private readonly guacamoleService: GuacamoleService,
     private readonly em: EntityManager
   ) {}
 
@@ -116,6 +115,24 @@ export class CloudResourcesService {
         status: cloudResource.status
       };
     });
+  }
+
+  async getGuacamoleToken(id: number, user: User) {
+    const cloudResource = await this.findOne(id);
+
+    if(!cloudResource) {
+      throw new NotFoundException('Instância não encontrada');
+    }
+
+    if(cloudResource.user.id !== user.id || cloudResource.status !== CloudResourceStatus.Ativo) {
+      throw new ForbiddenException('Acesso negado');
+    }
+
+    const guacamoleToken = this.guacamoleService.generateGuacamoleToken(cloudResource.instance);
+    
+    return {
+      token: guacamoleToken
+    };
   }
 
   findOne(id: number) {

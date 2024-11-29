@@ -160,7 +160,7 @@ export class ComputeService {
         return response.data.server;
     }
 
-    async waitForInstanceToBeReady(instanceId: string, maxRetries = 10, delay = 5000) {
+    async waitForInstanceToBeReady(instanceId: string, maxRetries = 40, delay = 5000) {
         for (let attempt = 0; attempt < maxRetries; attempt++) {
             const instance = await this.findOneInstance(instanceId);
     
@@ -226,6 +226,7 @@ export class ComputeService {
     generateUserDataScript(password: string): string {
         const script = `#!/bin/bash
         echo "ubuntu:${password}" | chpasswd
+        echo "User-data script executed successfully!" > /home/ubuntu/user-data-test.txt
         `;
 
         return Buffer.from(script).toString('base64')

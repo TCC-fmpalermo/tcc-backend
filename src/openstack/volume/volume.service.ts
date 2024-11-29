@@ -67,7 +67,21 @@ export class VolumeService {
         };
     }
 
-    async waitForVolumeToBeAvailable(volumeId: string, maxRetries = 20, delay = 5000): Promise<void> {
+    async waitForDeleteVolume(volumeId: string, maxRetries = 100, delay = 5000): Promise<void> {
+        for (let attempt = 0; attempt < maxRetries; attempt++) {
+            const volume = await this.findOneVolume(volumeId);
+
+            if (volume.status !== 'in-use') {
+                return;
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, delay));
+        }
+
+        throw new Error('Tempo limite atingido');
+    }
+
+    async waitForVolumeToBeAvailable(volumeId: string, maxRetries = 100, delay = 5000): Promise<void> {
         for (let attempt = 0; attempt < maxRetries; attempt++) {
             const volume = await this.findOneVolume(volumeId);
 
