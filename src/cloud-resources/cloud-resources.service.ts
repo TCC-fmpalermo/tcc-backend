@@ -11,6 +11,12 @@ import { User } from 'src/users/entities/user.entity';
 import { InstancesService } from 'src/instances/instances.service';
 import { VolumesService } from 'src/volumes/volumes.service';
 import { ComputeService } from 'src/openstack/compute/compute.service';
+import { ImageService } from 'src/openstack/image/image.service';
+import { VolumeService } from 'src/openstack/volume/volume.service';
+import { IdentityService } from 'src/openstack/identity/identity.service';
+import * as dayjs from "dayjs";
+import { last } from 'rxjs';
+import { chooseMBorGB } from 'src/utils/formatBytes';
 
 @Injectable()
 export class CloudResourcesService {
@@ -19,7 +25,10 @@ export class CloudResourcesService {
     private readonly cloudResourceRepository: EntityRepository<CloudResource>,
     private readonly desktopOptionsService: DesktopOptionsService,
     private readonly openstackService: OpenstackService,
+    private readonly identityService: IdentityService,
     private readonly computeService: ComputeService,
+    private readonly imageService: ImageService,
+    private readonly volumeService: VolumeService,
     private readonly instancesService: InstancesService,
     private readonly volumesService: VolumesService,
     private readonly em: EntityManager
@@ -33,6 +42,7 @@ export class CloudResourcesService {
       defaultUsername
     } = await this.desktopOptionsService.findOne(desktopOptionId);
 
+    const flavor = await this.computeService.getFlavorDetails(openstackFlavorId);
     const instanceName = 'instance-' + Date.now();
     const password = this.computeService.generatePassword(12);
 
@@ -47,14 +57,18 @@ export class CloudResourcesService {
 
     const instance = await this.instancesService.create({
       name: instanceName,
-      openstackInstanceId: newEnvironment.instanceId,
+      ipAddress: newEnvironment.ipAddress,
       username: defaultUsername,
       password: password,
-      ipAddress: newEnvironment.ipAddress,
-      openstackNetworkId: newEnvironment.networkId
+      cpus: flavor.vcpus,
+      ram: flavor.ram,
+      openstackInstanceId: newEnvironment.instanceId,
+      openstackNetworkId: newEnvironment.networkId,
+      openstackFlavorId: openstackFlavorId
     });
 
     const volume = await this.volumesService.create({
+      size: size,
       openstackVolumeId: newEnvironment.volumeId,
       openstackImageId: openstackImageId,
     });
@@ -73,7 +87,35 @@ export class CloudResourcesService {
   }
 
   findAll() {
-    return this.cloudResourceRepository.findAll({ populate: ['instance', 'volume', 'desktopOption'] });
+    return this.cloudResourceRepository.findAll({ populate: ['instance', 'volume'] });
+  }
+
+  async findUserCloudResources(user: number): Promise<any> {
+    const cloudResources = await this.cloudResourceRepository.find({ user: user }, { populate: ['instance', 'volume'], orderBy: { id: 'ASC' } });
+
+    await this.identityService.authenticate();
+    const images = await this.imageService.getImages();
+
+    return cloudResources.map(({ instance, volume, ...cloudResource }) => {
+      return {
+        id: cloudResource.id,
+        alias: cloudResource.alias,
+        createdAt: dayjs(cloudResource.createdAt).format('DD-MM-YYYY HH:mm:ss'),
+        updatedAt: dayjs(cloudResource.updatedAt).format('DD-MM-YYYY HH:mm:ss'),
+        lastAccessedAt: cloudResource.lastAccessedAt ? dayjs(cloudResource.lastAccessedAt).format('DD-MM-YYYY HH:mm:ss'): "Sem acesso registrado",
+        instance: {
+          id: instance.id,
+          cpus: `${instance.cpus} cores`,
+          ram: chooseMBorGB(instance.ram, 'MB', 0),
+        },
+        volume: {
+          id: volume.id,
+          size: `${volume.size} GB`,
+          imageInfo: images.find((image) => image.id === volume.openstackImageId),
+        },
+        status: cloudResource.status
+      };
+    });
   }
 
   findOne(id: number) {

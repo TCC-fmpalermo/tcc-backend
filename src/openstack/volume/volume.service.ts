@@ -60,14 +60,14 @@ export class VolumeService {
                 },
         ));
 
-        return response.data.volume;
+        return {
+            id: response.data.volume.id,
+            status: response.data.volume.status,
+            size: response.data.volume.size
+        };
     }
 
     async waitForVolumeToBeAvailable(volumeId: string, maxRetries = 20, delay = 5000): Promise<void> {
-
-        console.log(`Aguardando volume ${volumeId} estar disponível...`);
-        
-
         for (let attempt = 0; attempt < maxRetries; attempt++) {
             const volume = await this.findOneVolume(volumeId);
 

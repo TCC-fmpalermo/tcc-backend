@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { IdentityService } from '../identity/identity.service';
 import { firstValueFrom } from 'rxjs';
+import { chooseMBorGB } from 'src/utils/formatBytes';
 
 @Injectable()
 export class ImageService {
@@ -28,13 +29,7 @@ export class ImageService {
         }
 
         return response.data.images.map((image) => {
-            const sizeInGB = image.size / 1024 / 1024 / 1024;
-            const sizeInMB = image.size / 1024 / 1024;
-
-            const size =
-                sizeInGB >= 1
-                    ? `${sizeInGB.toFixed(2)} GB`
-                    : `${sizeInMB.toFixed(2)} MB`;
+            const size = chooseMBorGB(image.size, 'B');
 
             return {
                 id: image.id,

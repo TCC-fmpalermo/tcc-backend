@@ -38,10 +38,10 @@ export class OpenstackService {
             this.progressService.sendProgress(userId, 0, 'Iniciando criação do ambiente...');
             await this.identityService.authenticate();
 
-            this.progressService.sendProgress(userId, 10, 'Criando rede...');
+            this.progressService.sendProgress(userId, 10, 'Criando rede privada...');
             networkId = await this.networkService.createNetwork();
 
-            this.progressService.sendProgress(userId, 20, 'Criando subnet...');
+            this.progressService.sendProgress(userId, 20, 'Criando sub-rede...');
             subnetId = await this.networkService.createSubnet(networkId);
 
             this.progressService.sendProgress(userId, 30, 'Adicionando interface de roteamento...');
@@ -52,13 +52,13 @@ export class OpenstackService {
             this.progressService.sendProgress(userId, 40, 'Criando volume...');
             volumeId = await this.volumeService.createVolume(size, openstackImageId);
 
-            this.progressService.sendProgress(userId, 50, 'Aguardando volume...');
+            this.progressService.sendProgress(userId, 50, 'Aguardando volume estar disponível...');
             await this.volumeService.waitForVolumeToBeAvailable(volumeId);
 
             this.progressService.sendProgress(userId, 80, 'Criando instância...');
             instanceId = await this.computeService.createInstance(instanceName, password, openstackFlavorId, volumeId, networkId);
 
-            this.progressService.sendProgress(userId, 90, 'Aguardando instância...');
+            this.progressService.sendProgress(userId, 90, 'Aguardando instância estar pronta...');
             await this.computeService.waitForInstanceToBeReady(instanceId);
 
             floatingip = await this.networkService.createFloatingIp({instanceId});

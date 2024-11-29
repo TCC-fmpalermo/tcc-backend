@@ -34,14 +34,15 @@ export class CloudResourcesController {
     });
   }
 
+  
   @Get()
   findAll() {
     return this.cloudResourcesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cloudResourcesService.findOne(+id);
+  @Get('mine')
+  findUserCloudResources(@Req() req: Request) {
+    return this.cloudResourcesService.findUserCloudResources(req.user.id);
   }
 
   @Patch(':id')

@@ -44,6 +44,22 @@ export class ComputeService {
         });
     }
 
+    async getFlavorDetails(flavorId: string) {
+        const token = this.identityService.getToken();
+        const response = await firstValueFrom(
+            this.httpService.get(
+                `${this.compute_url}/v2.1/flavors/${flavorId}`,
+                {
+                    headers: {
+                        'X-Auth-Token': token,
+                    },
+                },
+            ),
+        );
+        
+        return response.data.flavor;
+    }
+
     async createNetworkInterface(networkId: string) {
         const token = this.identityService.getToken();
         const guacamoleInstanceId = this.guacamole_instance_id;
@@ -140,12 +156,11 @@ export class ComputeService {
                 },
             ),
         );
+
         return response.data.server;
     }
 
     async waitForInstanceToBeReady(instanceId: string, maxRetries = 10, delay = 5000) {
-        console.log(`Aguardando instância ${instanceId} ser criada...`);
-        
         for (let attempt = 0; attempt < maxRetries; attempt++) {
             const instance = await this.findOneInstance(instanceId);
     

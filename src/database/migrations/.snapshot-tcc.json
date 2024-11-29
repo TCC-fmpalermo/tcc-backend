@@ -158,6 +158,34 @@
           "length": 255,
           "mappedType": "string"
         },
+        "cpus": {
+          "name": "cpus",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "ram": {
+          "name": "ram",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "openstack_flavor_id": {
+          "name": "openstack_flavor_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
         "openstack_network_id": {
           "name": "openstack_network_id",
           "type": "varchar(255)",
@@ -462,6 +490,15 @@
           "unsigned": false,
           "autoincrement": true,
           "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "size": {
+          "name": "size",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
           "nullable": false,
           "mappedType": "integer"
         },

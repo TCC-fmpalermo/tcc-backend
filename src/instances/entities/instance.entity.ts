@@ -20,6 +20,15 @@ export class Instance {
   password!: string;
 
   @Property()
+  cpus!: number;
+
+  @Property()
+  ram!: number;
+
+  @Property()
+  openstackFlavorId!: string;
+
+  @Property()
   openstackNetworkId!: string;
 
   @Property()
