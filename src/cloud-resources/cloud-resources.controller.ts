@@ -1,17 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Res } from '@nestjs/common';
 import { CloudResourcesService } from './cloud-resources.service';
 import { CreateCloudResourceDto } from './dto/create-cloud-resource.dto';
 import { UpdateCloudResourceDto } from './dto/update-cloud-resource.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { Request, Response } from 'express';
+import { ProgressService } from 'src/progress/progress.service';
 
 @Controller('cloud-resources')
 @UseGuards(AuthGuard)
 export class CloudResourcesController {
-  constructor(private readonly cloudResourcesService: CloudResourcesService) {}
+  constructor(
+    private readonly cloudResourcesService: CloudResourcesService,
+    private readonly progressService: ProgressService
+  ) {}
 
   @Post()
   create(@Req() request, @Body() createCloudResourceDto: CreateCloudResourceDto) {
     return this.cloudResourcesService.create(createCloudResourceDto, request.user);
+  }
+
+  @Get('progress')
+  async sendProgress(@Req() req: Request, @Res() res: Response) {
+    const userId = req.user.id;
+    
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    
+    this.progressService.registerStream(+userId, res);
+
+    req.on('close', () => {
+      this.progressService.unregisterStream(+userId);
+    });
   }
 
   @Get()

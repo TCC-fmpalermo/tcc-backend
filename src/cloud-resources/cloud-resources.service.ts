@@ -37,6 +37,7 @@ export class CloudResourcesService {
     const password = this.computeService.generatePassword(12);
 
     const newEnvironment = await this.openstackService.createEnvironment({
+      userId: user.id,
       instanceName,
       password,
       size,

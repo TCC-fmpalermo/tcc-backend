@@ -7,6 +7,7 @@ import { OpenstackModule } from 'src/openstack/openstack.module';
 import { DesktopOptionsModule } from 'src/desktop-options/desktop-options.module';
 import { InstancesModule } from 'src/instances/instances.module';
 import { VolumesModule } from 'src/volumes/volumes.module';
+import { ProgressModule } from 'src/progress/progress.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { VolumesModule } from 'src/volumes/volumes.module';
     DesktopOptionsModule,
     OpenstackModule,
     InstancesModule,
-    VolumesModule
+    VolumesModule,
+    ProgressModule
   ],
   controllers: [CloudResourcesController],
   providers: [CloudResourcesService]

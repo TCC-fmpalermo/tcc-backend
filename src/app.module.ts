@@ -11,6 +11,7 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
 import { OpenstackModule } from './openstack/openstack.module';
 import { DesktopOptionsModule } from './desktop-options/desktop-options.module';
+import { ProgressModule } from './progress/progress.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { DesktopOptionsModule } from './desktop-options/desktop-options.module';
     AuthModule,
     PermissionsModule,
     RolesModule,
-    OpenstackModule
+    OpenstackModule,
+    ProgressModule
   ],
   controllers: [],
   providers: [],
