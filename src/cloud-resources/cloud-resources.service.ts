@@ -16,6 +16,7 @@ import { IdentityService } from 'src/openstack/identity/identity.service';
 import * as dayjs from "dayjs";
 import { chooseMBorGB } from 'src/utils/formatBytes';
 import { GuacamoleService } from 'src/instances/guacamole/guacamole.service';
+import { UpdateCloudResourceStatusDto } from './dto/update-cloud-resource-status.dto';
 
 @Injectable()
 export class CloudResourcesService {
@@ -85,8 +86,41 @@ export class CloudResourcesService {
     return cloudResource;
   }
 
-  findAll() {
-    return this.cloudResourceRepository.findAll({ populate: ['instance', 'volume'] });
+  async findAll() {
+    const cloudResources = await this.cloudResourceRepository.find({}, { populate: ['user', 'instance', 'volume'], orderBy: { id: 'ASC' } });
+
+    await this.identityService.authenticate();
+    const images = await this.imageService.getImages();
+    const flavors = await this.computeService.getFlavorsDetails();
+
+    return cloudResources.map(({ instance, volume, ...cloudResource }) => {
+      return {
+        id: cloudResource.id,
+        alias: cloudResource.alias,
+        createdAt: dayjs(cloudResource.createdAt).format('DD-MM-YYYY HH:mm:ss'),
+        updatedAt: dayjs(cloudResource.updatedAt).format('DD-MM-YYYY HH:mm:ss'),
+        lastAccessedAt: cloudResource.lastAccessedAt ? dayjs(cloudResource.lastAccessedAt).format('DD-MM-YYYY HH:mm:ss'): "Sem acesso registrado",
+        instance: {
+          id: instance.id,
+          name: instance.name,
+          ipAddress: instance.ipAddress,
+          flavorSpecs: flavors.find((flavor) => flavor.id === instance.openstackFlavorId),
+          cpus: `${instance.cpus} cores`,
+          ram: chooseMBorGB(instance.ram, 'MB', 0),
+        },
+        volume: {
+          id: volume.id,
+          size: `${volume.size} GB`,
+          imageInfo: images.find((image) => image.id === volume.openstackImageId),
+        },
+        user: {
+          id: cloudResource.user.id,
+          firstName: cloudResource.user.firstName,
+          lastName: cloudResource.user.lastName,
+        },
+        status: cloudResource.status
+      };
+    });
   }
 
   async findUserCloudResources(user: number): Promise<any> {
@@ -141,8 +175,18 @@ export class CloudResourcesService {
 
   async update(id: number, updateCloudResourceDto: UpdateCloudResourceDto) {
     const cloudResource = await this.findOne(id);
-    if (!cloudResource) return null;
+    if (!cloudResource) throw new NotFoundException('Instância não encontrada');
     wrap(cloudResource).assign(updateCloudResourceDto);
+    await this.em.flush();
+    return cloudResource;
+  }
+
+  async updateStatus(id: number, { status }: UpdateCloudResourceStatusDto) {
+    const cloudResource = await this.findOne(id);
+
+    if (!cloudResource) throw new NotFoundException('Instância não encontrada');
+
+    wrap(cloudResource).assign({ status: status });
     await this.em.flush();
     return cloudResource;
   }

@@ -5,6 +5,7 @@ import { UpdateCloudResourceDto } from './dto/update-cloud-resource.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request, Response } from 'express';
 import { ProgressService } from 'src/progress/progress.service';
+import { UpdateCloudResourceStatusDto } from './dto/update-cloud-resource-status.dto';
 
 @Controller('cloud-resources')
 @UseGuards(AuthGuard)
@@ -53,6 +54,11 @@ export class CloudResourcesController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCloudResourceDto: UpdateCloudResourceDto) {
     return this.cloudResourcesService.update(+id, updateCloudResourceDto);
+  }
+
+  @Patch(':id/status')
+  updateStatus(@Param('id') id: string, @Body() updateCloudResourceDto: UpdateCloudResourceStatusDto) {
+    return this.cloudResourcesService.updateStatus(+id, updateCloudResourceDto);
   }
 
   @Delete(':id')

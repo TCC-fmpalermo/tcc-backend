@@ -59,10 +59,8 @@ export class DesktopRequestsService {
     const whereCondition = {
       user: { id: userId }
     };
-    console.log(whereCondition);
     
     const desktopRequests = await this.em.find(DesktopRequest, whereCondition, { populate: ['user'], orderBy: { id: 'ASC' } });
-    console.log(desktopRequests);
     
     const desktopOptions = await this.desktopOptionsService.findAll({ status: DesktopOptionStatus.Ativo });
     
