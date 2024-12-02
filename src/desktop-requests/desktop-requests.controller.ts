@@ -21,9 +21,9 @@ export class DesktopRequestsController {
     return this.desktopRequestsService.findAll(filters);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.desktopRequestsService.findOne(+id);
+  @Get('/mine')
+  findUserDesktopRequests(@Req() request: Request) {
+    return this.desktopRequestsService.findUserDesktopRequests(request.user.id);
   }
 
   @Patch(':id/update-status')
@@ -32,7 +32,7 @@ export class DesktopRequestsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.desktopRequestsService.remove(+id);
+  remove(@Param('id') id: string, @Req() request: Request) {
+    return this.desktopRequestsService.remove(+id, request.user.id);
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDesktopRequestDto } from './dto/create-desktop-request.dto';
 import { UpdateDesktopRequestDto } from './dto/update-desktop-request-status.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
@@ -50,6 +50,36 @@ export class DesktopRequestsService {
       };
     });
   }
+  
+  async findUserDesktopRequests(userId: number): Promise<any> {
+    if(!userId) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    const whereCondition = {
+      user: { id: userId }
+    };
+    console.log(whereCondition);
+    
+    const desktopRequests = await this.em.find(DesktopRequest, whereCondition, { populate: ['user'], orderBy: { id: 'ASC' } });
+    console.log(desktopRequests);
+    
+    const desktopOptions = await this.desktopOptionsService.findAll({ status: DesktopOptionStatus.Ativo });
+    
+    return desktopRequests.map((desktopRequest) => {
+      return {
+        ...desktopRequest,
+        user: {
+          id: desktopRequest.user.id,
+          firstName: desktopRequest.user.firstName,
+          lastName: desktopRequest.user.lastName,
+        },
+        desktopOption: desktopOptions.find((desktopOption) => desktopOption.id === desktopRequest.desktopOption.id),
+        requestedAt: dayjs(desktopRequest.requestedAt).format('DD-MM-YYYY HH:mm:ss'),
+        finishedAt: desktopRequest.finishedAt ? dayjs(desktopRequest.finishedAt).format('DD-MM-YYYY HH:mm:ss') : 'Sem data de conclusão',
+      };
+    });
+  }
 
   findOne(id: number) {
     return this.em.findOne(DesktopRequest, id);
@@ -64,9 +94,14 @@ export class DesktopRequestsService {
     return desktopRequest;
   }
 
-  async remove(id: number) {
-    const desktopRequest = this.em.getReference(DesktopRequest, id);
-    if (!desktopRequest) return null;
+  async remove(id: number, userId: number) {
+    const desktopRequest = await this.findOne(id);
+    if (!desktopRequest) throw new NotFoundException('Solicitação de desktop não encontrada');
+
+    if(desktopRequest.user.id !== userId) {
+      throw new ForbiddenException('Você não pode excluir essa solicitação');
+    }
+
     await this.em.removeAndFlush(desktopRequest);
     return desktopRequest;
   }
