@@ -1,20 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Query } from '@nestjs/common';
 import { CreateDesktopRequestDto } from './dto/create-desktop-request.dto';
-import { UpdateDesktopRequestDto } from './dto/update-desktop-request.dto';
+import { UpdateDesktopRequestDto } from './dto/update-desktop-request-status.dto';
 import { DesktopRequestsService } from './desktop-requests.service';
+import { Request } from 'express';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { GetDesktopRequestDto } from './dto/get-desktop-request.dto';
 
 @Controller('desktop-requests')
+@UseGuards(AuthGuard)
 export class DesktopRequestsController {
   constructor(private readonly desktopRequestsService: DesktopRequestsService) {}
 
   @Post()
-  create(@Body() createDesktopRequestDto: CreateDesktopRequestDto) {
-    return this.desktopRequestsService.create(createDesktopRequestDto);
+  create(@Body() createDesktopRequestDto: CreateDesktopRequestDto, @Req() request: Request) {
+    return this.desktopRequestsService.create(createDesktopRequestDto, request.user);
   }
 
   @Get()
-  findAll() {
-    return this.desktopRequestsService.findAll();
+  findAll(@Query() filters: GetDesktopRequestDto) {
+    return this.desktopRequestsService.findAll(filters);
   }
 
   @Get(':id')
@@ -22,9 +26,9 @@ export class DesktopRequestsController {
     return this.desktopRequestsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDesktopRequestDto: UpdateDesktopRequestDto) {
-    return this.desktopRequestsService.update(+id, updateDesktopRequestDto);
+  @Patch(':id/update-status')
+  updateStatus(@Param('id') id: string, @Body() updateDesktopRequestDto: UpdateDesktopRequestDto) {
+    return this.desktopRequestsService.updateStatus(+id, updateDesktopRequestDto);
   }
 
   @Delete(':id')

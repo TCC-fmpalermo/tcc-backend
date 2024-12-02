@@ -226,7 +226,6 @@ export class ComputeService {
     generateUserDataScript(password: string): string {
         const script = `#!/bin/bash
         echo "ubuntu:${password}" | chpasswd
-        echo "User-data script executed successfully!" > /home/ubuntu/user-data-test.txt
         `;
 
         return Buffer.from(script).toString('base64')

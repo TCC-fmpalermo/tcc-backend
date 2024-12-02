@@ -9,7 +9,6 @@ export class GuacamoleService {
 
     encryptToken(data: object): string {
         const iv = crypto.randomBytes(16);
-        console.log(this.CIPHER, this.SECRET_KEY);
         
         const cipher = crypto.createCipheriv(this.CIPHER, Buffer.from(this.SECRET_KEY), iv);
 

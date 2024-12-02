@@ -13,6 +13,7 @@ export const RolesDisplay: Record<UserRoles, string> = {
 export const Permissions = {
 CREATE_USER: 'CREATE_USER',
 VIEW_USERS: 'VIEW_USERS',
+ACCESS_OWN_INSTANCES: 'ACCESS_OWN_INSTANCES',
 // EDIT_PROFILE: 'edit_profile',
 // CHANGE_STATUS: 'change_status',
 };
@@ -22,6 +23,8 @@ export const RolePermissions: Record<string, string[]> = {
     Permissions.CREATE_USER,
     Permissions.VIEW_USERS,
 ],
-[Roles.USER]: [],
+[Roles.USER]: [
+    Permissions.ACCESS_OWN_INSTANCES
+],
 };
   

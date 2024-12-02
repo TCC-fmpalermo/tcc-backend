@@ -1,37 +1,65 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDesktopRequestDto } from './dto/create-desktop-request.dto';
-import { UpdateDesktopRequestDto } from './dto/update-desktop-request.dto';
+import { UpdateDesktopRequestDto } from './dto/update-desktop-request-status.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { DesktopRequest } from './entities/desktop-request.entity';
 import { EntityRepository, wrap } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
+import { User } from 'src/users/entities/user.entity';
+import { DesktopOption, DesktopOptionStatus } from 'src/desktop-options/entities/desktop-option.entity';
+import { GetDesktopRequestDto } from './dto/get-desktop-request.dto';
+import * as dayjs from "dayjs";
+import { DesktopOptionsService } from 'src/desktop-options/desktop-options.service';
 
 @Injectable()
 export class DesktopRequestsService {
   constructor(
     @InjectRepository(DesktopRequest)
     private readonly desktopRequestRepository: EntityRepository<DesktopRequest>,
+    private readonly desktopOptionsService: DesktopOptionsService,
     private readonly em: EntityManager
   ) {}
 
-  async create(createDesktopRequestDto: CreateDesktopRequestDto) {
-    const desktopRequest = this.desktopRequestRepository.create(createDesktopRequestDto);
+  async create(createDesktopRequestDto: CreateDesktopRequestDto, user: User) {
+    const desktopRequest = this.desktopRequestRepository.create({
+      ...createDesktopRequestDto,
+      desktopOption: this.em.getReference(DesktopOption, createDesktopRequestDto.desktopOptionId),
+      user: this.em.getReference(User, user.id),
+    });
     await this.em.persistAndFlush(desktopRequest);
     return desktopRequest;
   }
 
-  findAll() {
-    return this.desktopRequestRepository.findAll();
+  async findAll({ status }: GetDesktopRequestDto):Promise<any> {
+    const whereCondition = status ? { status } : {};
+    const desktopRequests = await this.em.find(DesktopRequest, whereCondition, { populate: ['user'], orderBy: { id: 'ASC' } });
+
+    const desktopOptions = await this.desktopOptionsService.findAll({ status: DesktopOptionStatus.Ativo });
+    
+    return desktopRequests.map((desktopRequest) => {
+      return {
+        ...desktopRequest,
+        user: {
+          id: desktopRequest.user.id,
+          firstName: desktopRequest.user.firstName,
+          lastName: desktopRequest.user.lastName,
+        },
+        desktopOption: desktopOptions.find((desktopOption) => desktopOption.id === desktopRequest.desktopOption.id),
+        requestedAt: dayjs(desktopRequest.requestedAt).format('DD-MM-YYYY HH:mm:ss'),
+        finishedAt: desktopRequest.finishedAt ? dayjs(desktopRequest.finishedAt).format('DD-MM-YYYY HH:mm:ss') : 'Sem data de conclusão',
+      };
+    });
   }
 
   findOne(id: number) {
     return this.em.findOne(DesktopRequest, id);
   }
 
-  async update(id: number, updateDesktopRequestDto: UpdateDesktopRequestDto) {
+  async updateStatus(id: number, { status }: UpdateDesktopRequestDto) {
     const desktopRequest = await this.findOne(id);
-    if (!desktopRequest) return null;
-    wrap(desktopRequest).assign(updateDesktopRequestDto);
+    if (!desktopRequest) throw new NotFoundException('Solicitação de desktop não encontrada');
+
+    wrap(desktopRequest).assign({ status: status });
     await this.em.flush();
     return desktopRequest;
   }

@@ -385,6 +385,16 @@
           "nullable": false,
           "mappedType": "integer"
         },
+        "objective": {
+          "name": "objective",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
         "user_id": {
           "name": "user_id",
           "type": "int",

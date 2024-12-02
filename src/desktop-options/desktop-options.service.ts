@@ -5,7 +5,6 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { DesktopOption, DesktopOptionStatus } from './entities/desktop-option.entity';
 import { EntityRepository, wrap } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
-import { OpenstackService } from 'src/openstack/openstack.service';
 import { GetDesktopOptionResponseDto } from './dto/get-desktop-option-response.dto';
 import { ComputeService } from 'src/openstack/compute/compute.service';
 import { ImageService } from 'src/openstack/image/image.service';

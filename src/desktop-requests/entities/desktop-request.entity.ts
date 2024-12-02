@@ -18,6 +18,9 @@ import { User } from "../../users/entities/user.entity";
   export class DesktopRequest {
     @PrimaryKey()
     id!: number;
+
+    @Property()
+    objective!: string;
   
     @ManyToOne(() => User)
     user!: User;
