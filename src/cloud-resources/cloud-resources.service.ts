@@ -191,10 +191,14 @@ export class CloudResourcesService {
     return cloudResource;
   }
 
-  async remove(id: number) {
+  async remove(id: number, userId: number) {
     const cloudResource = await this.findOne(id);
     
     if (!cloudResource) throw new NotFoundException('Desktop não encontrado');
+
+    if(cloudResource.user.id !== userId) {
+      throw new ForbiddenException('Acesso negado');
+    }
 
     await this.openstackService.deleteEnvironment({
       instanceId: cloudResource.instance.openstackInstanceId,
