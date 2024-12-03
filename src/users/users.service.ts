@@ -10,6 +10,8 @@ import * as dayjs from "dayjs";
 import { GetUsersDto } from './dto/get-users.dto';
 import { RolesDisplay } from 'src/permissions/role-and-permissions.config';
 import { GetUsersResponseDto } from './dto/get-users-response.dto';
+import { RegisterDto } from 'src/auth/dto/register.dto';
+import { UpdatePersonalInformationDto } from './dto/update-personal-information.dto';
 
 
 @Injectable()
@@ -20,13 +22,28 @@ export class UsersService {
     private readonly em: EntityManager
   ) {}
 
+  async register(data: RegisterDto) {
+    const isEmailUnique = await this.findOneByEmail(data.email);
+    
+    if (isEmailUnique) {
+      throw new BadRequestException('E-mail já cadastrado');
+    }
+    
+    const user = this.userRepository.create({
+      ...data,
+      password: await argon2.hash(data.password),
+    });
+
+    await this.em.persistAndFlush(user);
+    return user;
+  }
+
   async create(createUserDto: CreateUserDto) {    
     const isEmailUnique = await this.findOneByEmail(createUserDto.email);
     if (isEmailUnique) {
       throw new BadRequestException('E-mail já cadastrado');
     }
     
-    //Cria o usuário e associa o role
     const user = this.userRepository.create({
       ...createUserDto,
       password: await argon2.hash(createUserDto.password),
@@ -75,7 +92,7 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return this.em.findOne(User, id);
+    return this.em.findOne(User, id, { exclude: ['password'] });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
@@ -85,6 +102,23 @@ export class UsersService {
     };
 
     wrap(user).assign(updateUserDto);
+
+    await this.em.flush();
+    
+    return user;
+  }
+
+  async updatePersonalInfo(id: number, updateUserDto: UpdatePersonalInformationDto) {
+    const user = await this.em.findOne(User, id);
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    };
+
+    wrap(user).assign({
+      firstName: updateUserDto.firstName,
+      lastName: updateUserDto.lastName,
+      password: updateUserDto.password ? await argon2.hash(updateUserDto.password): user.password
+    });
 
     await this.em.flush();
     

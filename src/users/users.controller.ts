@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -7,6 +7,8 @@ import { Permissions as PermissionTypes } from 'src/permissions/role-and-permiss
 import { RbacGuard } from 'src/auth/guards/rbac.guard';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { GetUsersDto } from './dto/get-users.dto';
+import { Request } from 'express';
+import { UpdatePersonalInformationDto } from './dto/update-personal-information.dto';
 
 @Controller('users')
 @UseGuards(AuthGuard)
@@ -27,19 +29,19 @@ export class UsersController {
     return this.usersService.findAll(filters);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  @Get('me')
+  findUser(@Req() request: Request) {
+    return this.usersService.findOne(request.user.id);
+  }
+
+  @Patch('me')
+  updatePersonalInformation(@Req() request: Request, @Body() updateUserDto: UpdatePersonalInformationDto) {
+    return this.usersService.updatePersonalInfo(request.user.id, updateUserDto);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
   }
 
   @Get('status/all')
