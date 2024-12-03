@@ -1,11 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Res, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Res } from '@nestjs/common';
 import { CloudResourcesService } from './cloud-resources.service';
 import { CreateCloudResourceDto } from './dto/create-cloud-resource.dto';
-import { UpdateCloudResourceDto } from './dto/update-cloud-resource.dto';
+import { UpdateCloudResourceAliasDto } from './dto/update-cloud-resource-alias.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request, Response } from 'express';
 import { ProgressService } from 'src/progress/progress.service';
 import { UpdateCloudResourceStatusDto } from './dto/update-cloud-resource-status.dto';
+import { Permissions as PermissionTypes } from 'src/permissions/role-and-permissions.config';
+import { Permissions } from 'src/permissions/permissions.decorator';
+import { RbacGuard } from 'src/auth/guards/rbac.guard';
 
 @Controller('cloud-resources')
 @UseGuards(AuthGuard)
@@ -16,12 +19,13 @@ export class CloudResourcesController {
   ) {}
 
   @Post()
-
   create(@Req() request: Request, @Body() createCloudResourceDto: CreateCloudResourceDto) {
     return this.cloudResourcesService.create(createCloudResourceDto, request.user);
   }
   
   @Get()
+  @Permissions(PermissionTypes.VIEW_CLOUD_RESOURCES)
+  @UseGuards(RbacGuard)
   findAll() {
     return this.cloudResourcesService.findAll();
   }
@@ -51,12 +55,14 @@ export class CloudResourcesController {
     return this.cloudResourcesService.getGuacamoleToken(+id, req.user);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCloudResourceDto: UpdateCloudResourceDto) {
-    return this.cloudResourcesService.update(+id, updateCloudResourceDto);
+  @Patch(':id/alias')
+  updateAlias(@Param('id') id: string, @Req() req: Request, @Body() updateCloudResourceAliasDto: UpdateCloudResourceAliasDto) {
+    return this.cloudResourcesService.updateAlias(+id, updateCloudResourceAliasDto, req.user.id);
   }
 
   @Patch(':id/status')
+  @Permissions(PermissionTypes.EDIT_DESKTOP_REQUEST_STATUS)
+  @UseGuards(RbacGuard)
   updateStatus(@Param('id') id: string, @Body() updateCloudResourceDto: UpdateCloudResourceStatusDto) {
     return this.cloudResourcesService.updateStatus(+id, updateCloudResourceDto);
   }

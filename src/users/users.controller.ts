@@ -16,14 +16,14 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @Permissions(PermissionTypes.CREATE_USER) // Necessita da permissão 'create_user'
+  @Permissions(PermissionTypes.CREATE_USER)
   @UseGuards(RbacGuard)
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
-  @Permissions(PermissionTypes.VIEW_USERS) // Necessita da permissão 'create_user'
+  @Permissions(PermissionTypes.VIEW_USERS)
   @UseGuards(RbacGuard)
   findAll(@Query() filters: GetUsersDto) {
     return this.usersService.findAll(filters);
@@ -39,6 +39,8 @@ export class UsersController {
     return this.usersService.updatePersonalInfo(request.user.id, updateUserDto);
   }
 
+  @Permissions(PermissionTypes.EDIT_USERS)
+  @UseGuards(RbacGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);

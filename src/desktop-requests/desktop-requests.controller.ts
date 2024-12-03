@@ -5,6 +5,9 @@ import { DesktopRequestsService } from './desktop-requests.service';
 import { Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { GetDesktopRequestDto } from './dto/get-desktop-request.dto';
+import { Permissions as PermissionTypes } from 'src/permissions/role-and-permissions.config';
+import { Permissions } from 'src/permissions/permissions.decorator';
+import { RbacGuard } from 'src/auth/guards/rbac.guard';
 
 @Controller('desktop-requests')
 @UseGuards(AuthGuard)
@@ -17,6 +20,8 @@ export class DesktopRequestsController {
   }
 
   @Get()
+  @Permissions(PermissionTypes.VIEW_DESKTOP_REQUESTS)
+  @UseGuards(RbacGuard)
   findAll(@Query() filters: GetDesktopRequestDto) {
     return this.desktopRequestsService.findAll(filters);
   }
@@ -27,6 +32,8 @@ export class DesktopRequestsController {
   }
 
   @Patch(':id/update-status')
+  @Permissions(PermissionTypes.EDIT_DESKTOP_REQUEST_STATUS)
+  @UseGuards(RbacGuard)
   updateStatus(@Param('id') id: string, @Body() updateDesktopRequestDto: UpdateDesktopRequestDto) {
     return this.desktopRequestsService.updateStatus(+id, updateDesktopRequestDto);
   }

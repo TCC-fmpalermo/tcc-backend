@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCloudResourceDto } from './dto/create-cloud-resource.dto';
-import { UpdateCloudResourceDto } from './dto/update-cloud-resource.dto';
+import { UpdateCloudResourceAliasDto } from './dto/update-cloud-resource-alias.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { CloudResource, CloudResourceStatus } from './entities/cloud-resource.entity';
 import { EntityRepository, wrap } from '@mikro-orm/core';
@@ -155,7 +155,7 @@ export class CloudResourcesService {
     const cloudResource = await this.findOne(id);
 
     if(!cloudResource) {
-      throw new NotFoundException('Instância não encontrada');
+      throw new NotFoundException('Desktop não encontrado');
     }
 
     if(cloudResource.user.id !== user.id || cloudResource.status !== CloudResourceStatus.Ativo) {
@@ -173,18 +173,26 @@ export class CloudResourcesService {
     return this.em.findOne(CloudResource, id, { populate: ['instance', 'volume', 'desktopOption'] });
   }
 
-  async update(id: number, updateCloudResourceDto: UpdateCloudResourceDto) {
+  async updateAlias(id: number, updateCloudResourceDto: UpdateCloudResourceAliasDto, userId: number) {
     const cloudResource = await this.findOne(id);
-    if (!cloudResource) throw new NotFoundException('Instância não encontrada');
-    wrap(cloudResource).assign(updateCloudResourceDto);
+
+    if (!cloudResource) throw new NotFoundException('Desktop não encontrado');
+
+    if(cloudResource.user.id !== userId) {
+      throw new ForbiddenException('Acesso negado');
+    }
+
+    wrap(cloudResource).assign({ alias: updateCloudResourceDto.alias });
+
     await this.em.flush();
+    
     return cloudResource;
   }
 
   async updateStatus(id: number, { status }: UpdateCloudResourceStatusDto) {
     const cloudResource = await this.findOne(id);
 
-    if (!cloudResource) throw new NotFoundException('Instância não encontrada');
+    if (!cloudResource) throw new NotFoundException('Desktop não encontrado');
 
     wrap(cloudResource).assign({ status: status });
     await this.em.flush();
