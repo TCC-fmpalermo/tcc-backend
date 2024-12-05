@@ -663,7 +663,7 @@
           "mappedType": "integer"
         }
       },
-      "name": "cloud_resource",
+      "name": "desktop",
       "schema": "public",
       "indexes": [
         {
@@ -671,7 +671,7 @@
             "instance_id"
           ],
           "composite": false,
-          "keyName": "cloud_resource_instance_id_unique",
+          "keyName": "desktop_instance_id_unique",
           "constraint": true,
           "primary": false,
           "unique": true
@@ -681,13 +681,13 @@
             "volume_id"
           ],
           "composite": false,
-          "keyName": "cloud_resource_volume_id_unique",
+          "keyName": "desktop_volume_id_unique",
           "constraint": true,
           "primary": false,
           "unique": true
         },
         {
-          "keyName": "cloud_resource_pkey",
+          "keyName": "desktop_pkey",
           "columnNames": [
             "id"
           ],
@@ -699,48 +699,48 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "cloud_resource_user_id_foreign": {
-          "constraintName": "cloud_resource_user_id_foreign",
+        "desktop_user_id_foreign": {
+          "constraintName": "desktop_user_id_foreign",
           "columnNames": [
             "user_id"
           ],
-          "localTableName": "public.cloud_resource",
+          "localTableName": "public.desktop",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "public.user",
           "updateRule": "cascade"
         },
-        "cloud_resource_instance_id_foreign": {
-          "constraintName": "cloud_resource_instance_id_foreign",
+        "desktop_instance_id_foreign": {
+          "constraintName": "desktop_instance_id_foreign",
           "columnNames": [
             "instance_id"
           ],
-          "localTableName": "public.cloud_resource",
+          "localTableName": "public.desktop",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "public.instance",
           "updateRule": "cascade"
         },
-        "cloud_resource_volume_id_foreign": {
-          "constraintName": "cloud_resource_volume_id_foreign",
+        "desktop_volume_id_foreign": {
+          "constraintName": "desktop_volume_id_foreign",
           "columnNames": [
             "volume_id"
           ],
-          "localTableName": "public.cloud_resource",
+          "localTableName": "public.desktop",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "public.volume",
           "updateRule": "cascade"
         },
-        "cloud_resource_desktop_option_id_foreign": {
-          "constraintName": "cloud_resource_desktop_option_id_foreign",
+        "desktop_desktop_option_id_foreign": {
+          "constraintName": "desktop_desktop_option_id_foreign",
           "columnNames": [
             "desktop_option_id"
           ],
-          "localTableName": "public.cloud_resource",
+          "localTableName": "public.desktop",
           "referencedColumnNames": [
             "id"
           ],

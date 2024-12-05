@@ -14,7 +14,6 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     
-    // Verifica se a requisição é do tipo EventSource
     if (this.isEventSource(request)) {
       const token = this.extractTokenFromQuery(request);
       if (!token) {
@@ -23,7 +22,6 @@ export class AuthGuard implements CanActivate {
       return this.validateToken(request, token);
     }
 
-    // Caso contrário, verifica o token no cabeçalho
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException("Usuário não autenticado");

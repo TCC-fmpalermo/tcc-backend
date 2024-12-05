@@ -5,7 +5,7 @@ import { UsersModule } from './users/users.module';
 import { InstancesModule } from './instances/instances.module';
 import { VolumesModule } from './volumes/volumes.module';
 import { DesktopRequestsModule } from './desktop-requests/desktop-requests.module';
-import { CloudResourcesModule } from './cloud-resources/cloud-resources.module';
+import { DesktopsModule } from './desktops/desktops.module';
 import { AuthModule } from './auth/auth.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
@@ -24,7 +24,7 @@ import { ProgressModule } from './progress/progress.module';
     DesktopOptionsModule,
     VolumesModule,
     DesktopRequestsModule,
-    CloudResourcesModule,
+    DesktopsModule,
     AuthModule,
     PermissionsModule,
     RolesModule,

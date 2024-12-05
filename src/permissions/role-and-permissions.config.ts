@@ -28,23 +28,23 @@ export const Permissions = {
 };
 
 export const RolePermissions: Record<string, string[]> = {
-[Roles.ADMIN]: [
-    Permissions.CREATE_USER,
-    Permissions.VIEW_USERS,
-    Permissions.EDIT_USERS,
-    Permissions.MANAGE_USERS,
-    Permissions.VIEW_DESKTOP_REQUESTS,
-    Permissions.MANAGE_DESKTOP_REQUESTS,
-    Permissions.EDIT_DESKTOP_REQUEST_STATUS,
-    Permissions.CREATE_DESKTOP_OPTION,
-    Permissions.MANAGE_DESKTOP_OPTIONS,
-    Permissions.CREATE_ANY_CLOUD_RESOURCE,
-    Permissions.VIEW_CLOUD_RESOURCES,
-    Permissions.MANAGE_CLOUD_RESOURCES,
-    Permissions.EDIT_CLOUD_RESOURCE_STATUS
-],
-[Roles.USER]: [
-    Permissions.VIEW_MY_DESKTOP_REQUESTS,
-],
+    [Roles.ADMIN]: [
+        Permissions.CREATE_USER,
+        Permissions.VIEW_USERS,
+        Permissions.EDIT_USERS,
+        Permissions.MANAGE_USERS,
+        Permissions.VIEW_DESKTOP_REQUESTS,
+        Permissions.MANAGE_DESKTOP_REQUESTS,
+        Permissions.EDIT_DESKTOP_REQUEST_STATUS,
+        Permissions.CREATE_DESKTOP_OPTION,
+        Permissions.MANAGE_DESKTOP_OPTIONS,
+        Permissions.CREATE_ANY_CLOUD_RESOURCE,
+        Permissions.VIEW_CLOUD_RESOURCES,
+        Permissions.MANAGE_CLOUD_RESOURCES,
+        Permissions.EDIT_CLOUD_RESOURCE_STATUS
+    ],
+    [Roles.USER]: [
+        Permissions.VIEW_MY_DESKTOP_REQUESTS,
+    ],
 };
   

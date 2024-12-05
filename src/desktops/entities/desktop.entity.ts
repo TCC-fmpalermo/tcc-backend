@@ -11,13 +11,13 @@ import { User } from "../../users/entities/user.entity";
 import { Volume } from "../../volumes/entities/volume.entity";
 import { DesktopOption } from "../../desktop-options/entities/desktop-option.entity";
   
-  export enum CloudResourceStatus {
+  export enum DesktopStatus {
     Ativo = 'Ativo',
     Inativo = 'Inativo',
   }
   
   @Entity()
-  export class CloudResource {
+  export class Desktop {
     @PrimaryKey()
     id!: number;
   
@@ -36,8 +36,8 @@ import { DesktopOption } from "../../desktop-options/entities/desktop-option.ent
     @Property({ nullable: true })
     lastAccessedAt?: Date;
   
-    @Enum(() => CloudResourceStatus)
-    status: CloudResourceStatus = CloudResourceStatus.Ativo;
+    @Enum(() => DesktopStatus)
+    status: DesktopStatus = DesktopStatus.Ativo;
   
     @ManyToOne(() => User)
     user!: User;

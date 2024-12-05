@@ -1,38 +1,38 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Res } from '@nestjs/common';
-import { CloudResourcesService } from './cloud-resources.service';
-import { CreateCloudResourceDto } from './dto/create-cloud-resource.dto';
-import { UpdateCloudResourceAliasDto } from './dto/update-cloud-resource-alias.dto';
+import { DesktopsService } from './desktops.service';
+import { CreateDesktopDto } from './dto/create-desktop.dto';
+import { UpdateDesktopAliasDto } from './dto/update-desktop-alias.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Request, Response } from 'express';
 import { ProgressService } from 'src/progress/progress.service';
-import { UpdateCloudResourceStatusDto } from './dto/update-cloud-resource-status.dto';
+import { UpdateDesktopStatusDto } from './dto/update-desktop-status.dto';
 import { Permissions as PermissionTypes } from 'src/permissions/role-and-permissions.config';
 import { Permissions } from 'src/permissions/permissions.decorator';
 import { RbacGuard } from 'src/auth/guards/rbac.guard';
 
 @Controller('cloud-resources')
 @UseGuards(AuthGuard)
-export class CloudResourcesController {
+export class DesktopsController {
   constructor(
-    private readonly cloudResourcesService: CloudResourcesService,
+    private readonly desktopsService: DesktopsService,
     private readonly progressService: ProgressService
   ) {}
 
   @Post()
-  create(@Req() request: Request, @Body() createCloudResourceDto: CreateCloudResourceDto) {
-    return this.cloudResourcesService.create(createCloudResourceDto, request.user);
+  create(@Req() request: Request, @Body() createDesktopDto: CreateDesktopDto) {
+    return this.desktopsService.create(createDesktopDto, request.user);
   }
   
   @Get()
   @Permissions(PermissionTypes.VIEW_CLOUD_RESOURCES)
   @UseGuards(RbacGuard)
   findAll() {
-    return this.cloudResourcesService.findAll();
+    return this.desktopsService.findAll();
   }
 
   @Get('mine')
-  findUserCloudResources(@Req() req: Request) {
-    return this.cloudResourcesService.findUserCloudResources(req.user.id);
+  findUserDesktops(@Req() req: Request) {
+    return this.desktopsService.findUserDesktops(req.user.id);
   }
 
   @Get('progress')
@@ -52,23 +52,23 @@ export class CloudResourcesController {
 
   @Get(':id/token')
   getGuacamoleToken(@Req() req: Request, @Param('id') id: string) {
-    return this.cloudResourcesService.getGuacamoleToken(+id, req.user);
+    return this.desktopsService.getGuacamoleToken(+id, req.user);
   }
 
   @Patch(':id/alias')
-  updateAlias(@Param('id') id: string, @Req() req: Request, @Body() updateCloudResourceAliasDto: UpdateCloudResourceAliasDto) {
-    return this.cloudResourcesService.updateAlias(+id, updateCloudResourceAliasDto, req.user.id);
+  updateAlias(@Param('id') id: string, @Req() req: Request, @Body() updateDesktopAliasDto: UpdateDesktopAliasDto) {
+    return this.desktopsService.updateAlias(+id, updateDesktopAliasDto, req.user.id);
   }
 
   @Patch(':id/status')
   @Permissions(PermissionTypes.EDIT_DESKTOP_REQUEST_STATUS)
   @UseGuards(RbacGuard)
-  updateStatus(@Param('id') id: string, @Body() updateCloudResourceDto: UpdateCloudResourceStatusDto) {
-    return this.cloudResourcesService.updateStatus(+id, updateCloudResourceDto);
+  updateStatus(@Param('id') id: string, @Body() updateDesktopDto: UpdateDesktopStatusDto) {
+    return this.desktopsService.updateStatus(+id, updateDesktopDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req: Request) {
-    return this.cloudResourcesService.remove(+id, req.user.id);
+    return this.desktopsService.remove(+id, req.user.id);
   }
 }

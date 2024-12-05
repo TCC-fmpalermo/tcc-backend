@@ -1,8 +1,8 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateCloudResourceDto } from './dto/create-cloud-resource.dto';
-import { UpdateCloudResourceAliasDto } from './dto/update-cloud-resource-alias.dto';
+import { CreateDesktopDto } from './dto/create-desktop.dto';
+import { UpdateDesktopAliasDto } from './dto/update-desktop-alias.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { CloudResource, CloudResourceStatus } from './entities/cloud-resource.entity';
+import { Desktop, DesktopStatus } from './entities/desktop.entity';
 import { EntityRepository, wrap } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { OpenstackService } from 'src/openstack/openstack.service';
@@ -16,13 +16,13 @@ import { IdentityService } from 'src/openstack/identity/identity.service';
 import * as dayjs from "dayjs";
 import { chooseMBorGB } from 'src/utils/formatBytes';
 import { GuacamoleService } from 'src/instances/guacamole/guacamole.service';
-import { UpdateCloudResourceStatusDto } from './dto/update-cloud-resource-status.dto';
+import { UpdateDesktopStatusDto } from './dto/update-desktop-status.dto';
 
 @Injectable()
-export class CloudResourcesService {
+export class DesktopsService {
   constructor(
-    @InjectRepository(CloudResource)
-    private readonly cloudResourceRepository: EntityRepository<CloudResource>,
+    @InjectRepository(Desktop)
+    private readonly desktopRepository: EntityRepository<Desktop>,
     private readonly desktopOptionsService: DesktopOptionsService,
     private readonly openstackService: OpenstackService,
     private readonly identityService: IdentityService,
@@ -34,7 +34,7 @@ export class CloudResourcesService {
     private readonly em: EntityManager
   ) {}
 
-  async create({ desktopOptionId, alias }: CreateCloudResourceDto, user: User) {
+  async create({ desktopOptionId, alias }: CreateDesktopDto, user: User) {
     const { 
       size, 
       openstackFlavorId, 
@@ -73,7 +73,7 @@ export class CloudResourcesService {
       openstackImageId: openstackImageId,
     });
 
-    const cloudResource = this.cloudResourceRepository.create({
+    const desktop = this.desktopRepository.create({
       alias,
       user: this.em.getReference(User, user.id),
       instance: instance,
@@ -81,25 +81,25 @@ export class CloudResourcesService {
       desktopOption: desktopOptionId,
     });
 
-    await this.em.persistAndFlush(cloudResource);
+    await this.em.persistAndFlush(desktop);
 
-    return cloudResource;
+    return desktop;
   }
 
   async findAll() {
-    const cloudResources = await this.cloudResourceRepository.find({}, { populate: ['user', 'instance', 'volume'], orderBy: { id: 'ASC' } });
+    const desktops = await this.desktopRepository.find({}, { populate: ['user', 'instance', 'volume'], orderBy: { id: 'ASC' } });
 
     await this.identityService.authenticate();
     const images = await this.imageService.getImages();
     const flavors = await this.computeService.getFlavorsDetails();
 
-    return cloudResources.map(({ instance, volume, ...cloudResource }) => {
+    return desktops.map(({ instance, volume, ...desktop }) => {
       return {
-        id: cloudResource.id,
-        alias: cloudResource.alias,
-        createdAt: dayjs(cloudResource.createdAt).format('DD-MM-YYYY HH:mm:ss'),
-        updatedAt: dayjs(cloudResource.updatedAt).format('DD-MM-YYYY HH:mm:ss'),
-        lastAccessedAt: cloudResource.lastAccessedAt ? dayjs(cloudResource.lastAccessedAt).format('DD-MM-YYYY HH:mm:ss'): "Sem acesso registrado",
+        id: desktop.id,
+        alias: desktop.alias,
+        createdAt: dayjs(desktop.createdAt).format('DD-MM-YYYY HH:mm:ss'),
+        updatedAt: dayjs(desktop.updatedAt).format('DD-MM-YYYY HH:mm:ss'),
+        lastAccessedAt: desktop.lastAccessedAt ? dayjs(desktop.lastAccessedAt).format('DD-MM-YYYY HH:mm:ss'): "Sem acesso registrado",
         instance: {
           id: instance.id,
           name: instance.name,
@@ -114,28 +114,28 @@ export class CloudResourcesService {
           imageInfo: images.find((image) => image.id === volume.openstackImageId),
         },
         user: {
-          id: cloudResource.user.id,
-          firstName: cloudResource.user.firstName,
-          lastName: cloudResource.user.lastName,
+          id: desktop.user.id,
+          firstName: desktop.user.firstName,
+          lastName: desktop.user.lastName,
         },
-        status: cloudResource.status
+        status: desktop.status
       };
     });
   }
 
-  async findUserCloudResources(user: number): Promise<any> {
-    const cloudResources = await this.cloudResourceRepository.find({ user: user }, { populate: ['instance', 'volume'], orderBy: { id: 'ASC' } });
+  async findUserDesktops(user: number): Promise<any> {
+    const desktops = await this.desktopRepository.find({ user: user }, { populate: ['instance', 'volume'], orderBy: { id: 'ASC' } });
 
     await this.identityService.authenticate();
     const images = await this.imageService.getImages();
 
-    return cloudResources.map(({ instance, volume, ...cloudResource }) => {
+    return desktops.map(({ instance, volume, ...desktop }) => {
       return {
-        id: cloudResource.id,
-        alias: cloudResource.alias,
-        createdAt: dayjs(cloudResource.createdAt).format('DD-MM-YYYY HH:mm:ss'),
-        updatedAt: dayjs(cloudResource.updatedAt).format('DD-MM-YYYY HH:mm:ss'),
-        lastAccessedAt: cloudResource.lastAccessedAt ? dayjs(cloudResource.lastAccessedAt).format('DD-MM-YYYY HH:mm:ss'): "Sem acesso registrado",
+        id: desktop.id,
+        alias: desktop.alias,
+        createdAt: dayjs(desktop.createdAt).format('DD-MM-YYYY HH:mm:ss'),
+        updatedAt: dayjs(desktop.updatedAt).format('DD-MM-YYYY HH:mm:ss'),
+        lastAccessedAt: desktop.lastAccessedAt ? dayjs(desktop.lastAccessedAt).format('DD-MM-YYYY HH:mm:ss'): "Sem acesso registrado",
         instance: {
           id: instance.id,
           cpus: `${instance.cpus} cores`,
@@ -146,23 +146,23 @@ export class CloudResourcesService {
           size: `${volume.size} GB`,
           imageInfo: images.find((image) => image.id === volume.openstackImageId),
         },
-        status: cloudResource.status
+        status: desktop.status
       };
     });
   }
 
   async getGuacamoleToken(id: number, user: User) {
-    const cloudResource = await this.findOne(id);
+    const desktop = await this.findOne(id);
 
-    if(!cloudResource) {
+    if(!desktop) {
       throw new NotFoundException('Desktop não encontrado');
     }
 
-    if(cloudResource.user.id !== user.id || cloudResource.status !== CloudResourceStatus.Ativo) {
+    if(desktop.user.id !== user.id || desktop.status !== DesktopStatus.Ativo) {
       throw new ForbiddenException('Acesso negado');
     }
 
-    const guacamoleToken = this.guacamoleService.generateGuacamoleToken(cloudResource.instance);
+    const guacamoleToken = this.guacamoleService.generateGuacamoleToken(desktop.instance);
     
     return {
       token: guacamoleToken
@@ -170,56 +170,56 @@ export class CloudResourcesService {
   }
 
   findOne(id: number) {
-    return this.em.findOne(CloudResource, id, { populate: ['instance', 'volume', 'desktopOption'] });
+    return this.em.findOne(Desktop, id, { populate: ['instance', 'volume', 'desktopOption'] });
   }
 
-  async updateAlias(id: number, updateCloudResourceDto: UpdateCloudResourceAliasDto, userId: number) {
-    const cloudResource = await this.findOne(id);
+  async updateAlias(id: number, updateDesktopDto: UpdateDesktopAliasDto, userId: number) {
+    const desktop = await this.findOne(id);
 
-    if (!cloudResource) throw new NotFoundException('Desktop não encontrado');
+    if (!desktop) throw new NotFoundException('Desktop não encontrado');
 
-    if(cloudResource.user.id !== userId) {
+    if(desktop.user.id !== userId) {
       throw new ForbiddenException('Acesso negado');
     }
 
-    wrap(cloudResource).assign({ alias: updateCloudResourceDto.alias });
+    wrap(desktop).assign({ alias: updateDesktopDto.alias });
 
     await this.em.flush();
     
-    return cloudResource;
+    return desktop;
   }
 
-  async updateStatus(id: number, { status }: UpdateCloudResourceStatusDto) {
-    const cloudResource = await this.findOne(id);
+  async updateStatus(id: number, { status }: UpdateDesktopStatusDto) {
+    const desktop = await this.findOne(id);
 
-    if (!cloudResource) throw new NotFoundException('Desktop não encontrado');
+    if (!desktop) throw new NotFoundException('Desktop não encontrado');
 
-    wrap(cloudResource).assign({ status: status });
+    wrap(desktop).assign({ status: status });
     await this.em.flush();
-    return cloudResource;
+    return desktop;
   }
 
   async remove(id: number, userId: number) {
-    const cloudResource = await this.findOne(id);
+    const desktop = await this.findOne(id);
     
-    if (!cloudResource) throw new NotFoundException('Desktop não encontrado');
+    if (!desktop) throw new NotFoundException('Desktop não encontrado');
 
-    if(cloudResource.user.id !== userId) {
+    if(desktop.user.id !== userId) {
       throw new ForbiddenException('Acesso negado');
     }
 
     await this.openstackService.deleteEnvironment({
-      instanceId: cloudResource.instance.openstackInstanceId,
-      ipAddress: cloudResource.instance.ipAddress,
-      networkId: cloudResource.instance.openstackNetworkId,
-      volumeId: cloudResource.volume.openstackVolumeId
+      instanceId: desktop.instance.openstackInstanceId,
+      ipAddress: desktop.instance.ipAddress,
+      networkId: desktop.instance.openstackNetworkId,
+      volumeId: desktop.volume.openstackVolumeId
     });
 
-    await this.em.removeAndFlush(cloudResource);
+    await this.em.removeAndFlush(desktop);
 
-    await this.instancesService.remove(cloudResource.instance.id);
-    await this.volumesService.remove(cloudResource.volume.id);
+    await this.instancesService.remove(desktop.instance.id);
+    await this.volumesService.remove(desktop.volume.id);
 
-    return cloudResource;
+    return desktop;
   }
 }
