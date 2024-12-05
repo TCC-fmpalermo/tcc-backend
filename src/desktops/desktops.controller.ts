@@ -10,7 +10,7 @@ import { Permissions as PermissionTypes } from 'src/permissions/role-and-permiss
 import { Permissions } from 'src/permissions/permissions.decorator';
 import { RbacGuard } from 'src/auth/guards/rbac.guard';
 
-@Controller('cloud-resources')
+@Controller('desktops')
 @UseGuards(AuthGuard)
 export class DesktopsController {
   constructor(
@@ -24,7 +24,7 @@ export class DesktopsController {
   }
   
   @Get()
-  @Permissions(PermissionTypes.VIEW_CLOUD_RESOURCES)
+  @Permissions(PermissionTypes.VIEW_DESKTOPS)
   @UseGuards(RbacGuard)
   findAll() {
     return this.desktopsService.findAll();
